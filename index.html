@@ -288,7 +288,15 @@
             <div class="already-played">
                 <h2>✅ Ai participat deja!</h2>
                 <p>Mulțumim pentru participare! Poți juca o singură dată pentru a menține competiția corectă.</p>
-                <p style="margin-top: 15px;">Vizitează standul pentru a-ți ridica premiul conform tier-ului obținut!</p>
+                
+                <div id="previousResultContainer" style="margin: 30px 0;">
+                    <h3 style="color: #374151; margin-bottom: 15px;">Rezultatul tău anterior:</h3>
+                    <div class="score-display" id="previousScore" style="font-size: 3em;"></div>
+                    <div id="previousTierBadge"></div>
+                    <div class="tier-message" id="previousTierMessage" style="font-size: 1.1em;"></div>
+                </div>
+                
+                <p style="margin-top: 20px; font-weight: 600; color: #1f2937;">Vizitează standul pentru a-ți ridica premiul!</p>
             </div>
         </div>
     </div>
@@ -299,227 +307,31 @@
         // ============================================
         
         const CONFIG = {
-            BACKEND_URL: null, // Set la URL-ul Apps Script după deploy (ex: "https://script.google.com/macros/s/.../exec")
+            BACKEND_URL: null,
             NUM_QUESTIONS: 3,
             LOCAL_STORAGE_KEY: 'cc_quiz_played',
-            USE_TOKENS: false // Setează true dacă folosești sistem de token-uri
+            SCORE_STORAGE_KEY: 'cc_quiz_score',
+            TIER_STORAGE_KEY: 'cc_quiz_tier',
+            USE_TOKENS: false
         };
         
         // ============================================
         // QUESTION BANK (30+ întrebări)
         // ============================================
         
-        const questionBank = [
-            // JavaScript/TypeScript (12 întrebări)
-            {
-                q: "Ce returnează `typeof null` în JavaScript?",
-                options: ["'null'", "'undefined'", "'object'", "'number'"],
-                correct: 2
-            },
-            {
-                q: "Ce afișează `console.log(0.1 + 0.2 === 0.3)` în JavaScript?",
-                options: ["true", "false", "undefined", "NaN"],
-                correct: 1
-            },
-            {
-                q: "Ce face `Array.prototype.map()` în JavaScript?",
-                options: ["Modifică array-ul original", "Creează un array nou cu rezultatele funcției", "Filtrează elementele", "Sortează array-ul"],
-                correct: 1
-            },
-            {
-                q: "Ce tip de variabilă NU poate fi reasignată în JavaScript?",
-                options: ["var", "let", "const", "function"],
-                correct: 2
-            },
-            {
-                q: "Ce afișează `console.log(1 + '1')` în JavaScript?",
-                options: ["2", "'11'", "11", "undefined"],
-                correct: 1
-            },
-            {
-                q: "Care e diferența principală între `==` și `===` în JavaScript?",
-                options: ["Nu e diferență", "`===` verifică și tipul de date", "`==` e mai rapid", "`===` funcționează doar cu numere"],
-                correct: 1
-            },
-            {
-                q: "Ce face `async/await` în JavaScript?",
-                options: ["Creează thread-uri noi", "Simplifică lucrul cu Promise-uri", "Oprește execuția programului", "Creează variabile asincrone"],
-                correct: 1
-            },
-            {
-                q: "Ce returnează `[1, 2, 3].reduce((a, b) => a + b, 0)` în JavaScript?",
-                options: ["0", "6", "[1,2,3]", "undefined"],
-                correct: 1
-            },
-            {
-                q: "Ce face `event.preventDefault()` în JavaScript?",
-                options: ["Șterge event-ul", "Oprește comportamentul default al browserului", "Creează un event nou", "Oprește propagarea"],
-                correct: 1
-            },
-            {
-                q: "Ce e o closure în JavaScript?",
-                options: ["O funcție închisă", "O funcție care reține scope-ul în care a fost creată", "O variabilă constantă", "O clasă privată"],
-                correct: 1
-            },
-            {
-                q: "Ce returnează `!!0` în JavaScript?",
-                options: ["true", "false", "0", "undefined"],
-                correct: 1
-            },
-            {
-                q: "Ce face `JSON.parse()` în JavaScript?",
-                options: ["Convertește un obiect în string", "Convertește un string JSON în obiect", "Validează JSON", "Comprimă JSON"],
-                correct: 1
-            },
-            
-            // Java (8 întrebări)
-            {
-                q: "Ce modificator face o variabilă constantă în Java?",
-                options: ["const", "final", "static", "readonly"],
-                correct: 1
-            },
-            {
-                q: "Ce e o interfață în Java?",
-                options: ["O clasă abstractă", "Un contract cu metode neimplementate", "Un tip de array", "O funcție statică"],
-                correct: 1
-            },
-            {
-                q: "Ce face keyword-ul `static` în Java?",
-                options: ["Face clasa finală", "Face membrul să aparțină clasei, nu instanței", "Oprește moștenirea", "Face metoda privată"],
-                correct: 1
-            },
-            {
-                q: "Ce tip returnează `void` în Java?",
-                options: ["null", "0", "false", "Nimic (niciun tip)"],
-                correct: 3
-            },
-            {
-                q: "Ce face `ArrayList` în Java?",
-                options: ["Creează un array fix", "Creează o listă dinamică", "Sortează un array", "Creează un hashmap"],
-                correct: 1
-            },
-            {
-                q: "Ce e polimorfismul în Java?",
-                options: ["Moștenire multiplă", "Mai multe forme ale aceluiași lucru", "O interfață", "O clasă abstractă"],
-                correct: 1
-            },
-            {
-                q: "Ce face `try-catch` în Java?",
-                options: ["Optimizează codul", "Gestionează excepțiile", "Creează thread-uri", "Validează input-ul"],
-                correct: 1
-            },
-            {
-                q: "Care e diferența între `==` și `.equals()` în Java pentru String-uri?",
-                options: ["Nu e diferență", "`==` compară referințele, `.equals()` compară conținutul", "`equals()` e mai rapid", "`==` e deprecated"],
-                correct: 1
-            },
-            
-            // Python (6 întrebări)
-            {
-                q: "Ce face `list.append()` în Python?",
-                options: ["Șterge ultimul element", "Adaugă un element la final", "Sortează lista", "Creează o copie"],
-                correct: 1
-            },
-            {
-                q: "Ce returnează `len([1, 2, 3])` în Python?",
-                options: ["1", "2", "3", "6"],
-                correct: 2
-            },
-            {
-                q: "Ce face `range(5)` în Python?",
-                options: ["Creează [0,1,2,3,4]", "Creează [1,2,3,4,5]", "Creează 5", "Creează un string"],
-                correct: 0
-            },
-            {
-                q: "Ce e un decorator în Python?",
-                options: ["O clasă", "O funcție care modifică o altă funcție", "Un comentariu", "O variabilă globală"],
-                correct: 1
-            },
-            {
-                q: "Ce face `dict.get('key')` în Python?",
-                options: ["Aruncă eroare dacă nu există", "Returnează valoarea sau None", "Șterge cheia", "Modifică dicționarul"],
-                correct: 1
-            },
-            {
-                q: "Ce tip e `True` în Python?",
-                options: ["int", "str", "bool", "float"],
-                correct: 2
-            },
-            
-            // SQL (5 întrebări)
-            {
-                q: "Ce face `SELECT DISTINCT` în SQL?",
-                options: ["Selectează toate rândurile", "Selectează doar rânduri unice", "Sortează rezultatele", "Șterge duplicate din tabel"],
-                correct: 1
-            },
-            {
-                q: "Ce tip de JOIN returnează doar rândurile comune în ambele tabele?",
-                options: ["LEFT JOIN", "RIGHT JOIN", "INNER JOIN", "OUTER JOIN"],
-                correct: 2
-            },
-            {
-                q: "Ce face comanda `DELETE FROM users WHERE id=5` în SQL?",
-                options: ["Șterge toate rândurile", "Șterge userul cu id=5", "Actualizează userul", "Selectează userul"],
-                correct: 1
-            },
-            {
-                q: "Ce face `COUNT(*)` în SQL?",
-                options: ["Înmulțește valorile", "Numără rândurile", "Calculează media", "Sortează datele"],
-                correct: 1
-            },
-            {
-                q: "Ce index îmbunătățește performanța query-urilor SQL?",
-                options: ["PRIMARY KEY", "INDEX", "UNIQUE", "Toate variantele"],
-                correct: 3
-            },
-            
-            // Language-Agnostic (9 întrebări)
-            {
-                q: "Ce complexitate are căutarea într-un array nesortat?",
-                options: ["O(1)", "O(log n)", "O(n)", "O(n²)"],
-                correct: 2
-            },
-            {
-                q: "Ce structură de date folosește principiul LIFO?",
-                options: ["Queue", "Stack", "Array", "Tree"],
-                correct: 1
-            },
-            {
-                q: "Ce cod HTTP înseamnă 'Not Found'?",
-                options: ["200", "404", "500", "403"],
-                correct: 1
-            },
-            {
-                q: "Ce face comanda `git commit` în Git?",
-                options: ["Trimite schimbările pe server", "Salvează schimbările local", "Creează un branch", "Șterge fișiere"],
-                correct: 1
-            },
-            {
-                q: "Ce e un REST API?",
-                options: ["O bază de date", "O arhitectură de comunicare web", "Un limbaj de programare", "Un framework"],
-                correct: 1
-            },
-            {
-                q: "Ce face `git pull` în Git?",
-                options: ["Șterge branch-ul", "Aduce ultimele schimbări de pe server", "Creează un commit", "Resetează repository-ul"],
-                correct: 1
-            },
-            {
-                q: "Ce cod HTTP înseamnă 'Success'?",
-                options: ["100", "200", "300", "400"],
-                correct: 1
-            },
-            {
-                q: "Ce complexitate are sortarea prin Quick Sort în medie?",
-                options: ["O(1)", "O(n)", "O(n log n)", "O(n²)"],
-                correct: 2
-            },
-            {
-                q: "Ce e un hash map?",
-                options: ["Un array", "O structură cu cheie-valoare", "O listă", "Un arbore"],
-                correct: 1
+        const questionBank = (() => {
+            // Întrebări encodate pentru anti-cheat
+            const e = "W3sicSI6ICJDZSByZXR1cm5lYXrEgyBgdHlwZW9mIG51bGxgIMOubiBKYXZhU2NyaXB0PyIsICJvcHRpb25zIjogWyInbnVsbCciLCAiJ3VuZGVmaW5lZCciLCAiJ29iamVjdCciLCAiJ251bWJlciciXSwgImMiOiAyfSwgeyJxIjogIkNlIGFmaciZZWF6xIMgYGNvbnNvbGUubG9nKDAuMSArIDAuMiA9PT0gMC4zKWAgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbInRydWUiLCAiZmFsc2UiLCAidW5kZWZpbmVkIiwgIk5hTiJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZmFjZSBgQXJyYXkucHJvdG90eXBlLm1hcCgpYCDDrm4gSmF2YVNjcmlwdD8iLCAib3B0aW9ucyI6IFsiTW9kaWZpY8SDIGFycmF5LXVsIG9yaWdpbmFsIiwgIkNyZWVhesSDIHVuIGFycmF5IG5vdSBjdSByZXp1bHRhdGVsZSBmdW5jyJtpZWkiLCAiRmlsdHJlYXrEgyBlbGVtZW50ZWxlIiwgIlNvcnRlYXrEgyBhcnJheS11bCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgdGlwIGRlIHZhcmlhYmlsxIMgTlUgcG9hdGUgZmkgcmVhc2lnbmF0xIMgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbInZhciIsICJsZXQiLCAiY29uc3QiLCAiZnVuY3Rpb24iXSwgImMiOiAyfSwgeyJxIjogIkNlIGFmaciZZWF6xIMgYGNvbnNvbGUubG9nKDEgKyAnMScpYCDDrm4gSmF2YVNjcmlwdD8iLCAib3B0aW9ucyI6IFsiMiIsICInMTEnIiwgIjExIiwgInVuZGVmaW5lZCJdLCAiYyI6IDF9LCB7InEiOiAiQ2FyZSBlIGRpZmVyZW7Im2EgcHJpbmNpcGFsxIMgw65udHJlIGA9PWAgyJlpIGA9PT1gIMOubiBKYXZhU2NyaXB0PyIsICJvcHRpb25zIjogWyJOdSBlIGRpZmVyZW7Im8SDIiwgImA9PT1gIHZlcmlmaWPEgyDImWkgdGlwdWwgZGUgZGF0ZSIsICJgPT1gIGUgbWFpIHJhcGlkIiwgImA9PT1gIGZ1bmPIm2lvbmVhesSDIGRvYXIgY3UgbnVtZXJlIl0sICJjIjogMX0sIHsicSI6ICJDZSBmYWNlIGBhc3luYy9hd2FpdGAgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbIkNyZWVhesSDIHRocmVhZC11cmkgbm9pIiwgIlNpbXBsaWZpY8SDIGx1Y3J1bCBjdSBQcm9taXNlLXVyaSIsICJPcHJlyJl0ZSBleGVjdcibaWEgcHJvZ3JhbXVsdWkiLCAiQ3JlZWF6xIMgdmFyaWFiaWxlIGFzaW5jcm9uZSJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgcmV0dXJuZWF6xIMgYFsxLCAyLCAzXS5yZWR1Y2UoKGEsIGIpID0+IGEgKyBiLCAwKWAgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbIjAiLCAiNiIsICJbMSwyLDNdIiwgInVuZGVmaW5lZCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZmFjZSBgZXZlbnQucHJldmVudERlZmF1bHQoKWAgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbIsiYdGVyZ2UgZXZlbnQtdWwiLCAiT3ByZciZdGUgY29tcG9ydGFtZW50dWwgZGVmYXVsdCBhbCBicm93c2VydWx1aSIsICJDcmVlYXrEgyB1biBldmVudCBub3UiLCAiT3ByZciZdGUgcHJvcGFnYXJlYSJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZSBvIGNsb3N1cmUgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbIk8gZnVuY8ibaWUgw65uY2hpc8SDIiwgIk8gZnVuY8ibaWUgY2FyZSByZcibaW5lIHNjb3BlLXVsIMOubiBjYXJlIGEgZm9zdCBjcmVhdMSDIiwgIk8gdmFyaWFiaWzEgyBjb25zdGFudMSDIiwgIk8gY2xhc8SDIHByaXZhdMSDIl0sICJjIjogMX0sIHsicSI6ICJDZSByZXR1cm5lYXrEgyBgISEwYCDDrm4gSmF2YVNjcmlwdD8iLCAib3B0aW9ucyI6IFsidHJ1ZSIsICJmYWxzZSIsICIwIiwgInVuZGVmaW5lZCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZmFjZSBgSlNPTi5wYXJzZSgpYCDDrm4gSmF2YVNjcmlwdD8iLCAib3B0aW9ucyI6IFsiQ29udmVydGXImXRlIHVuIG9iaWVjdCDDrm4gc3RyaW5nIiwgIkNvbnZlcnRlyJl0ZSB1biBzdHJpbmcgSlNPTiDDrm4gb2JpZWN0IiwgIlZhbGlkZWF6xIMgSlNPTiIsICJDb21wcmltxIMgSlNPTiJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgbW9kaWZpY2F0b3IgZmFjZSBvIHZhcmlhYmlsxIMgY29uc3RhbnTEgyDDrm4gSmF2YT8iLCAib3B0aW9ucyI6IFsiY29uc3QiLCAiZmluYWwiLCAic3RhdGljIiwgInJlYWRvbmx5Il0sICJjIjogMX0sIHsicSI6ICJDZSBlIG8gaW50ZXJmYcibxIMgw65uIEphdmE/IiwgIm9wdGlvbnMiOiBbIk8gY2xhc8SDIGFic3RyYWN0xIMiLCAiVW4gY29udHJhY3QgY3UgbWV0b2RlIG5laW1wbGVtZW50YXRlIiwgIlVuIHRpcCBkZSBhcnJheSIsICJPIGZ1bmPIm2llIHN0YXRpY8SDIl0sICJjIjogMX0sIHsicSI6ICJDZSBmYWNlIGtleXdvcmQtdWwgYHN0YXRpY2Agw65uIEphdmE/IiwgIm9wdGlvbnMiOiBbIkZhY2UgY2xhc2EgZmluYWzEgyIsICJGYWNlIG1lbWJydWwgc8SDIGFwYXLIm2luxIMgY2xhc2VpLCBudSBpbnN0YW7Im2VpIiwgIk9wcmXImXRlIG1vyJl0ZW5pcmVhIiwgIkZhY2UgbWV0b2RhIHByaXZhdMSDIl0sICJjIjogMX0sIHsicSI6ICJDZSB0aXAgcmV0dXJuZWF6xIMgYHZvaWRgIMOubiBKYXZhPyIsICJvcHRpb25zIjogWyJudWxsIiwgIjAiLCAiZmFsc2UiLCAiTmltaWMgKG5pY2l1biB0aXApIl0sICJjIjogM30sIHsicSI6ICJDZSBmYWNlIGBBcnJheUxpc3RgIMOubiBKYXZhPyIsICJvcHRpb25zIjogWyJDcmVlYXrEgyB1biBhcnJheSBmaXgiLCAiQ3JlZWF6xIMgbyBsaXN0xIMgZGluYW1pY8SDIiwgIlNvcnRlYXrEgyB1biBhcnJheSIsICJDcmVlYXrEgyB1biBoYXNobWFwIl0sICJjIjogMX0sIHsicSI6ICJDZSBlIHBvbGltb3JmaXNtdWwgw65uIEphdmE/IiwgIm9wdGlvbnMiOiBbIk1vyJl0ZW5pcmUgbXVsdGlwbMSDIiwgIk1haSBtdWx0ZSBmb3JtZSBhbGUgYWNlbHVpYciZaSBsdWNydSIsICJPIGludGVyZmHIm8SDIiwgIk8gY2xhc8SDIGFic3RyYWN0xIMiXSwgImMiOiAxfSwgeyJxIjogIkNlIGZhY2UgYHRyeS1jYXRjaGAgw65uIEphdmE/IiwgIm9wdGlvbnMiOiBbIk9wdGltaXplYXrEgyBjb2R1bCIsICJHZXN0aW9uZWF6xIMgZXhjZXDIm2lpbGUiLCAiQ3JlZWF6xIMgdGhyZWFkLXVyaSIsICJWYWxpZGVhesSDIGlucHV0LXVsIl0sICJjIjogMX0sIHsicSI6ICJDYXJlIGUgZGlmZXJlbsibYSDDrm50cmUgYD09YCDImWkgYC5lcXVhbHMoKWAgw65uIEphdmEgcGVudHJ1IFN0cmluZy11cmk/IiwgIm9wdGlvbnMiOiBbIk51IGUgZGlmZXJlbsibxIMiLCAiYD09YCBjb21wYXLEgyByZWZlcmluyJtlbGUsIGAuZXF1YWxzKClgIGNvbXBhcsSDIGNvbsibaW51dHVsIiwgImBlcXVhbHMoKWAgZSBtYWkgcmFwaWQiLCAiYD09YCBlIGRlcHJlY2F0ZWQiXSwgImMiOiAxfSwgeyJxIjogIkNlIGZhY2UgYGxpc3QuYXBwZW5kKClgIMOubiBQeXRob24/IiwgIm9wdGlvbnMiOiBbIsiYdGVyZ2UgdWx0aW11bCBlbGVtZW50IiwgIkFkYXVnxIMgdW4gZWxlbWVudCBsYSBmaW5hbCIsICJTb3J0ZWF6xIMgbGlzdGEiLCAiQ3JlZWF6xIMgbyBjb3BpZSJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgcmV0dXJuZWF6xIMgYGxlbihbMSwgMiwgM10pYCDDrm4gUHl0aG9uPyIsICJvcHRpb25zIjogWyIxIiwgIjIiLCAiMyIsICI2Il0sICJjIjogMn0sIHsicSI6ICJDZSBmYWNlIGByYW5nZSg1KWAgw65uIFB5dGhvbj8iLCAib3B0aW9ucyI6IFsiQ3JlZWF6xIMgWzAsMSwyLDMsNF0iLCAiQ3JlZWF6xIMgWzEsMiwzLDQsNV0iLCAiQ3JlZWF6xIMgNSIsICJDcmVlYXrEgyB1biBzdHJpbmciXSwgImMiOiAwfSwgeyJxIjogIkNlIGUgdW4gZGVjb3JhdG9yIMOubiBQeXRob24/IiwgIm9wdGlvbnMiOiBbIk8gY2xhc8SDIiwgIk8gZnVuY8ibaWUgY2FyZSBtb2RpZmljxIMgbyBhbHTEgyBmdW5jyJtpZSIsICJVbiBjb21lbnRhcml1IiwgIk8gdmFyaWFiaWzEgyBnbG9iYWzEgyJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZmFjZSBgZGljdC5nZXQoJ2tleScpYCDDrm4gUHl0aG9uPyIsICJvcHRpb25zIjogWyJBcnVuY8SDIGVyb2FyZSBkYWPEgyBudSBleGlzdMSDIiwgIlJldHVybmVhesSDIHZhbG9hcmVhIHNhdSBOb25lIiwgIsiYdGVyZ2UgY2hlaWEiLCAiTW9kaWZpY8SDIGRpY8ibaW9uYXJ1bCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgdGlwIGUgYFRydWVgIMOubiBQeXRob24/IiwgIm9wdGlvbnMiOiBbImludCIsICJzdHIiLCAiYm9vbCIsICJmbG9hdCJdLCAiYyI6IDJ9LCB7InEiOiAiQ2UgZmFjZSBgU0VMRUNUIERJU1RJTkNUYCDDrm4gU1FMPyIsICJvcHRpb25zIjogWyJTZWxlY3RlYXrEgyB0b2F0ZSByw6JuZHVyaWxlIiwgIlNlbGVjdGVhesSDIGRvYXIgcsOibmR1cmkgdW5pY2UiLCAiU29ydGVhesSDIHJlenVsdGF0ZWxlIiwgIsiYdGVyZ2UgZHVwbGljYXRlIGRpbiB0YWJlbCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgdGlwIGRlIEpPSU4gcmV0dXJuZWF6xIMgZG9hciByw6JuZHVyaWxlIGNvbXVuZSDDrm4gYW1iZWxlIHRhYmVsZT8iLCAib3B0aW9ucyI6IFsiTEVGVCBKT0lOIiwgIlJJR0hUIEpPSU4iLCAiSU5ORVIgSk9JTiIsICJPVVRFUiBKT0lOIl0sICJjIjogMn0sIHsicSI6ICJDZSBmYWNlIGNvbWFuZGEgYERFTEVURSBGUk9NIHVzZXJzIFdIRVJFIGlkPTVgIMOubiBTUUw/IiwgIm9wdGlvbnMiOiBbIsiYdGVyZ2UgdG9hdGUgcsOibmR1cmlsZSIsICLImHRlcmdlIHVzZXJ1bCBjdSBpZD01IiwgIkFjdHVhbGl6ZWF6xIMgdXNlcnVsIiwgIlNlbGVjdGVhesSDIHVzZXJ1bCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZmFjZSBgQ09VTlQoKilgIMOubiBTUUw/IiwgIm9wdGlvbnMiOiBbIsOObm11bMibZciZdGUgdmFsb3JpbGUiLCAiTnVtxINyxIMgcsOibmR1cmlsZSIsICJDYWxjdWxlYXrEgyBtZWRpYSIsICJTb3J0ZWF6xIMgZGF0ZWxlIl0sICJjIjogMX0sIHsicSI6ICJDZSBpbmRleCDDrm1idW7Eg3TEg8ibZciZdGUgcGVyZm9ybWFuyJthIHF1ZXJ5LXVyaWxvciBTUUw/IiwgIm9wdGlvbnMiOiBbIlBSSU1BUlkgS0VZIiwgIklOREVYIiwgIlVOSVFVRSIsICJUb2F0ZSB2YXJpYW50ZWxlIl0sICJjIjogM30sIHsicSI6ICJDZSBjb21wbGV4aXRhdGUgYXJlIGPEg3V0YXJlYSDDrm50ci11biBhcnJheSBuZXNvcnRhdD8iLCAib3B0aW9ucyI6IFsiTygxKSIsICJPKGxvZyBuKSIsICJPKG4pIiwgIk8obsKyKSJdLCAiYyI6IDJ9LCB7InEiOiAiQ2Ugc3RydWN0dXLEgyBkZSBkYXRlIGZvbG9zZciZdGUgcHJpbmNpcGl1bCBMSUZPPyIsICJvcHRpb25zIjogWyJRdWV1ZSIsICJTdGFjayIsICJBcnJheSIsICJUcmVlIl0sICJjIjogMX0sIHsicSI6ICJDZSBjb2QgSFRUUCDDrm5zZWFtbsSDICdOb3QgRm91bmQnPyIsICJvcHRpb25zIjogWyIyMDAiLCAiNDA0IiwgIjUwMCIsICI0MDMiXSwgImMiOiAxfSwgeyJxIjogIkNlIGZhY2UgY29tYW5kYSBgZ2l0IGNvbW1pdGAgw65uIEdpdD8iLCAib3B0aW9ucyI6IFsiVHJpbWl0ZSBzY2hpbWLEg3JpbGUgcGUgc2VydmVyIiwgIlNhbHZlYXrEgyBzY2hpbWLEg3JpbGUgbG9jYWwiLCAiQ3JlZWF6xIMgdW4gYnJhbmNoIiwgIsiYdGVyZ2UgZmnImWllcmUiXSwgImMiOiAxfSwgeyJxIjogIkNlIGUgdW4gUkVTVCBBUEk/IiwgIm9wdGlvbnMiOiBbIk8gYmF6xIMgZGUgZGF0ZSIsICJPIGFyaGl0ZWN0dXLEgyBkZSBjb211bmljYXJlIHdlYiIsICJVbiBsaW1iYWogZGUgcHJvZ3JhbWFyZSIsICJVbiBmcmFtZXdvcmsiXSwgImMiOiAxfSwgeyJxIjogIkNlIGZhY2UgYGdpdCBwdWxsYCDDrm4gR2l0PyIsICJvcHRpb25zIjogWyLImHRlcmdlIGJyYW5jaC11bCIsICJBZHVjZSB1bHRpbWVsZSBzY2hpbWLEg3JpIGRlIHBlIHNlcnZlciIsICJDcmVlYXrEgyB1biBjb21taXQiLCAiUmVzZXRlYXrEgyByZXBvc2l0b3J5LXVsIl0sICJjIjogMX0sIHsicSI6ICJDZSBjb2QgSFRUUCDDrm5zZWFtbsSDICdTdWNjZXNzJz8iLCAib3B0aW9ucyI6IFsiMTAwIiwgIjIwMCIsICIzMDAiLCAiNDAwIl0sICJjIjogMX0sIHsicSI6ICJDZSBjb21wbGV4aXRhdGUgYXJlIHNvcnRhcmVhIHByaW4gUXVpY2sgU29ydCDDrm4gbWVkaWU/IiwgIm9wdGlvbnMiOiBbIk8oMSkiLCAiTyhuKSIsICJPKG4gbG9nIG4pIiwgIk8obsKyKSJdLCAiYyI6IDJ9LCB7InEiOiAiQ2UgZSB1biBoYXNoIG1hcD8iLCAib3B0aW9ucyI6IFsiVW4gYXJyYXkiLCAiTyBzdHJ1Y3R1csSDIGN1IGNoZWllLXZhbG9hcmUiLCAiTyBsaXN0xIMiLCAiVW4gYXJib3JlIl0sICJjIjogMX1d";
+            const k = [2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 2, 0, 1, 1, 2, 1, 2, 1, 1, 3, 2, 1, 1, 1, 1, 1, 1, 2, 1];
+            try {
+                const d = atob(e);
+                const p = JSON.parse(d);
+                return p.map((q, i) => ({q: q.q, options: q.options, correct: k[i]}));
+            } catch(err) {
+                console.error('Decode error');
+                return [];
             }
-        ];
+        })();
         
         // ============================================
         // STATE
@@ -536,17 +348,34 @@
         // ============================================
         
         window.onload = function() {
-            // Verifică dacă a mai jucat
             if (localStorage.getItem(CONFIG.LOCAL_STORAGE_KEY)) {
-                showScreen('alreadyPlayedScreen');
+                showAlreadyPlayedScreen();
                 return;
             }
-            
-            // Afișează câmpul de token dacă e configurat
             if (CONFIG.USE_TOKENS) {
                 document.getElementById('tokenInputGroup').style.display = 'block';
             }
         };
+        
+        function showAlreadyPlayedScreen() {
+            const previousScore = localStorage.getItem(CONFIG.SCORE_STORAGE_KEY);
+            const previousTier = localStorage.getItem(CONFIG.TIER_STORAGE_KEY);
+            
+            if (previousScore && previousTier) {
+                document.getElementById('previousScore').textContent = `${previousScore}/${CONFIG.NUM_QUESTIONS}`;
+                const tierBadge = document.getElementById('previousTierBadge');
+                tierBadge.innerHTML = `<div class="tier-badge tier-${previousTier.toLowerCase()}">${previousTier}</div>`;
+                const messages = {
+                    'T1': '🏆 Excelent! Mergi la zona ALBASTRĂ pentru premiul tău special!',
+                    'T2': '👏 Foarte bine! Vizitează zona VERDE pentru premiul tău!',
+                    'T3': '🌟 Bun început! Treci pe la zona PORTOCALIE pentru premiul tău!'
+                };
+                document.getElementById('previousTierMessage').textContent = messages[previousTier];
+            } else {
+                document.getElementById('previousResultContainer').style.display = 'none';
+            }
+            showScreen('alreadyPlayedScreen');
+        }
         
         // ============================================
         // NAVIGATION
@@ -634,15 +463,15 @@
             const tier = getTier(score);
             const duration = Math.round((Date.now() - startTime) / 1000);
             
-            // Marchează ca participat
+            // Marchează ca participat și salvează rezultatul
             localStorage.setItem(CONFIG.LOCAL_STORAGE_KEY, '1');
+            localStorage.setItem(CONFIG.SCORE_STORAGE_KEY, score);
+            localStorage.setItem(CONFIG.TIER_STORAGE_KEY, tier);
             
-            // Trimite la backend dacă e configurat
             if (CONFIG.BACKEND_URL) {
                 submitToBackend(score, duration);
             }
             
-            // Afișează rezultate
             displayResults(score, tier);
         }
         
