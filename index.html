@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeCamp Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        h1 {
+            color: #1f2937;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #374151;
+            font-weight: 500;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border 0.2s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .question-counter {
+            color: #6b7280;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        
+        .question-text {
+            color: #1f2937;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .option {
+            padding: 14px 18px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            text-align: left;
+        }
+        
+        .option:hover {
+            border-color: #667eea;
+            background: #f9fafb;
+        }
+        
+        .option.selected {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+        
+        .result-screen {
+            text-align: center;
+        }
+        
+        .score-display {
+            font-size: 4em;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+        
+        .tier-badge {
+            display: inline-block;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.8em;
+            font-weight: 700;
+            color: white;
+            margin: 20px 0;
+        }
+        
+        .tier-t1 {
+            background: #2563EB;
+        }
+        
+        .tier-t2 {
+            background: #16A34A;
+        }
+        
+        .tier-t3 {
+            background: #EA580C;
+        }
+        
+        .tier-message {
+            font-size: 1.2em;
+            color: #374151;
+            margin: 20px 0;
+            line-height: 1.6;
+        }
+        
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+        
+        .info-message {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+        
+        .already-played {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .already-played h2 {
+            color: #1f2937;
+            margin-bottom: 15px;
+        }
+        
+        .already-played p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 1.6em;
+            }
+            
+            .score-display {
+                font-size: 3em;
+            }
+            
+            .tier-badge {
+                font-size: 1.4em;
+                padding: 12px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Start Screen -->
+        <div id="startScreen" class="screen active">
+            <h1>🚀 CodeCamp Quiz</h1>
+            <p class="subtitle">Testează-ți cunoștințele de programare în 3 întrebări!</p>
+            
+            <div class="input-group" id="tokenInputGroup" style="display: none;">
+                <label for="tokenInput">Token (opțional):</label>
+                <input type="text" id="tokenInput" placeholder="Introdu token-ul tău unic">
+                <div class="info-message" style="margin-top: 10px;">
+                    Dacă ai primit un token, introdu-l mai sus. Altfel, poți continua fără token.
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="startQuiz()">Începe Quiz-ul</button>
+        </div>
+        
+        <!-- Quiz Screen -->
+        <div id="quizScreen" class="screen">
+            <div class="question-counter" id="questionCounter"></div>
+            <div class="question-text" id="questionText"></div>
+            <div class="options" id="optionsContainer"></div>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>Următoarea</button>
+        </div>
+        
+        <!-- Result Screen -->
+        <div id="resultScreen" class="screen">
+            <div class="result-screen">
+                <h1>Rezultatul tău</h1>
+                <div class="score-display" id="scoreDisplay"></div>
+                <div id="tierBadge"></div>
+                <div class="tier-message" id="tierMessage"></div>
+            </div>
+        </div>
+        
+        <!-- Already Played Screen -->
+        <div id="alreadyPlayedScreen" class="screen">
+            <div class="already-played">
+                <h2>✅ Ai participat deja!</h2>
+                <p>Mulțumim pentru participare! Poți juca o singură dată pentru a menține competiția corectă.</p>
+                <p style="margin-top: 15px;">Vizitează standul pentru a-ți ridica premiul conform tier-ului obținut!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURARE
+        // ============================================
+        
+        const CONFIG = {
+            BACKEND_URL: null, // Set la URL-ul Apps Script după deploy (ex: "https://script.google.com/macros/s/.../exec")
+            NUM_QUESTIONS: 3,
+            LOCAL_STORAGE_KEY: 'cc_quiz_played',
+            USE_TOKENS: false // Setează true dacă folosești sistem de token-uri
+        };
+        
+        // ============================================
+        // QUESTION BANK (30+ întrebări)
+        // ============================================
+        
+        const questionBank = [
+            // JavaScript/TypeScript (12 întrebări)
+            {
+                q: "Ce returnează `typeof null` în JavaScript?",
+                options: ["'null'", "'undefined'", "'object'", "'number'"],
+                correct: 2
+            },
+            {
+                q: "Ce afișează `console.log(0.1 + 0.2 === 0.3)` în JavaScript?",
+                options: ["true", "false", "undefined", "NaN"],
+                correct: 1
+            },
+            {
+                q: "Ce face `Array.prototype.map()` în JavaScript?",
+                options: ["Modifică array-ul original", "Creează un array nou cu rezultatele funcției", "Filtrează elementele", "Sortează array-ul"],
+                correct: 1
+            },
+            {
+                q: "Ce tip de variabilă NU poate fi reasignată în JavaScript?",
+                options: ["var", "let", "const", "function"],
+                correct: 2
+            },
+            {
+                q: "Ce afișează `console.log(1 + '1')` în JavaScript?",
+                options: ["2", "'11'", "11", "undefined"],
+                correct: 1
+            },
+            {
+                q: "Care e diferența principală între `==` și `===` în JavaScript?",
+                options: ["Nu e diferență", "`===` verifică și tipul de date", "`==` e mai rapid", "`===` funcționează doar cu numere"],
+                correct: 1
+            },
+            {
+                q: "Ce face `async/await` în JavaScript?",
+                options: ["Creează thread-uri noi", "Simplifică lucrul cu Promise-uri", "Oprește execuția programului", "Creează variabile asincrone"],
+                correct: 1
+            },
+            {
+                q: "Ce returnează `[1, 2, 3].reduce((a, b) => a + b, 0)` în JavaScript?",
+                options: ["0", "6", "[1,2,3]", "undefined"],
+                correct: 1
+            },
+            {
+                q: "Ce face `event.preventDefault()` în JavaScript?",
+                options: ["Șterge event-ul", "Oprește comportamentul default al browserului", "Creează un event nou", "Oprește propagarea"],
+                correct: 1
+            },
+            {
+                q: "Ce e o closure în JavaScript?",
+                options: ["O funcție închisă", "O funcție care reține scope-ul în care a fost creată", "O variabilă constantă", "O clasă privată"],
+                correct: 1
+            },
+            {
+                q: "Ce returnează `!!0` în JavaScript?",
+                options: ["true", "false", "0", "undefined"],
+                correct: 1
+            },
+            {
+                q: "Ce face `JSON.parse()` în JavaScript?",
+                options: ["Convertește un obiect în string", "Convertește un string JSON în obiect", "Validează JSON", "Comprimă JSON"],
+                correct: 1
+            },
+            
+            // Java (8 întrebări)
+            {
+                q: "Ce modificator face o variabilă constantă în Java?",
+                options: ["const", "final", "static", "readonly"],
+                correct: 1
+            },
+            {
+                q: "Ce e o interfață în Java?",
+                options: ["O clasă abstractă", "Un contract cu metode neimplementate", "Un tip de array", "O funcție statică"],
+                correct: 1
+            },
+            {
+                q: "Ce face keyword-ul `static` în Java?",
+                options: ["Face clasa finală", "Face membrul să aparțină clasei, nu instanței", "Oprește moștenirea", "Face metoda privată"],
+                correct: 1
+            },
+            {
+                q: "Ce tip returnează `void` în Java?",
+                options: ["null", "0", "false", "Nimic (niciun tip)"],
+                correct: 3
+            },
+            {
+                q: "Ce face `ArrayList` în Java?",
+                options: ["Creează un array fix", "Creează o listă dinamică", "Sortează un array", "Creează un hashmap"],
+                correct: 1
+            },
+            {
+                q: "Ce e polimorfismul în Java?",
+                options: ["Moștenire multiplă", "Mai multe forme ale aceluiași lucru", "O interfață", "O clasă abstractă"],
+                correct: 1
+            },
+            {
+                q: "Ce face `try-catch` în Java?",
+                options: ["Optimizează codul", "Gestionează excepțiile", "Creează thread-uri", "Validează input-ul"],
+                correct: 1
+            },
+            {
+                q: "Care e diferența între `==` și `.equals()` în Java pentru String-uri?",
+                options: ["Nu e diferență", "`==` compară referințele, `.equals()` compară conținutul", "`equals()` e mai rapid", "`==` e deprecated"],
+                correct: 1
+            },
+            
+            // Python (6 întrebări)
+            {
+                q: "Ce face `list.append()` în Python?",
+                options: ["Șterge ultimul element", "Adaugă un element la final", "Sortează lista", "Creează o copie"],
+                correct: 1
+            },
+            {
+                q: "Ce returnează `len([1, 2, 3])` în Python?",
+                options: ["1", "2", "3", "6"],
+                correct: 2
+            },
+            {
+                q: "Ce face `range(5)` în Python?",
+                options: ["Creează [0,1,2,3,4]", "Creează [1,2,3,4,5]", "Creează 5", "Creează un string"],
+                correct: 0
+            },
+            {
+                q: "Ce e un decorator în Python?",
+                options: ["O clasă", "O funcție care modifică o altă funcție", "Un comentariu", "O variabilă globală"],
+                correct: 1
+            },
+            {
+                q: "Ce face `dict.get('key')` în Python?",
+                options: ["Aruncă eroare dacă nu există", "Returnează valoarea sau None", "Șterge cheia", "Modifică dicționarul"],
+                correct: 1
+            },
+            {
+                q: "Ce tip e `True` în Python?",
+                options: ["int", "str", "bool", "float"],
+                correct: 2
+            },
+            
+            // SQL (5 întrebări)
+            {
+                q: "Ce face `SELECT DISTINCT` în SQL?",
+                options: ["Selectează toate rândurile", "Selectează doar rânduri unice", "Sortează rezultatele", "Șterge duplicate din tabel"],
+                correct: 1
+            },
+            {
+                q: "Ce tip de JOIN returnează doar rândurile comune în ambele tabele?",
+                options: ["LEFT JOIN", "RIGHT JOIN", "INNER JOIN", "OUTER JOIN"],
+                correct: 2
+            },
+            {
+                q: "Ce face comanda `DELETE FROM users WHERE id=5` în SQL?",
+                options: ["Șterge toate rândurile", "Șterge userul cu id=5", "Actualizează userul", "Selectează userul"],
+                correct: 1
+            },
+            {
+                q: "Ce face `COUNT(*)` în SQL?",
+                options: ["Înmulțește valorile", "Numără rândurile", "Calculează media", "Sortează datele"],
+                correct: 1
+            },
+            {
+                q: "Ce index îmbunătățește performanța query-urilor SQL?",
+                options: ["PRIMARY KEY", "INDEX", "UNIQUE", "Toate variantele"],
+                correct: 3
+            },
+            
+            // Language-Agnostic (9 întrebări)
+            {
+                q: "Ce complexitate are căutarea într-un array nesortat?",
+                options: ["O(1)", "O(log n)", "O(n)", "O(n²)"],
+                correct: 2
+            },
+            {
+                q: "Ce structură de date folosește principiul LIFO?",
+                options: ["Queue", "Stack", "Array", "Tree"],
+                correct: 1
+            },
+            {
+                q: "Ce cod HTTP înseamnă 'Not Found'?",
+                options: ["200", "404", "500", "403"],
+                correct: 1
+            },
+            {
+                q: "Ce face comanda `git commit` în Git?",
+                options: ["Trimite schimbările pe server", "Salvează schimbările local", "Creează un branch", "Șterge fișiere"],
+                correct: 1
+            },
+            {
+                q: "Ce e un REST API?",
+                options: ["O bază de date", "O arhitectură de comunicare web", "Un limbaj de programare", "Un framework"],
+                correct: 1
+            },
+            {
+                q: "Ce face `git pull` în Git?",
+                options: ["Șterge branch-ul", "Aduce ultimele schimbări de pe server", "Creează un commit", "Resetează repository-ul"],
+                correct: 1
+            },
+            {
+                q: "Ce cod HTTP înseamnă 'Success'?",
+                options: ["100", "200", "300", "400"],
+                correct: 1
+            },
+            {
+                q: "Ce complexitate are sortarea prin Quick Sort în medie?",
+                options: ["O(1)", "O(n)", "O(n log n)", "O(n²)"],
+                correct: 2
+            },
+            {
+                q: "Ce e un hash map?",
+                options: ["Un array", "O structură cu cheie-valoare", "O listă", "Un arbore"],
+                correct: 1
+            }
+        ];
+        
+        // ============================================
+        // STATE
+        // ============================================
+        
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let selectedOption = null;
+        let startTime = null;
+        
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        
+        window.onload = function() {
+            // Verifică dacă a mai jucat
+            if (localStorage.getItem(CONFIG.LOCAL_STORAGE_KEY)) {
+                showScreen('alreadyPlayedScreen');
+                return;
+            }
+            
+            // Afișează câmpul de token dacă e configurat
+            if (CONFIG.USE_TOKENS) {
+                document.getElementById('tokenInputGroup').style.display = 'block';
+            }
+        };
+        
+        // ============================================
+        // NAVIGATION
+        // ============================================
+        
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+        
+        // ============================================
+        // QUIZ LOGIC
+        // ============================================
+        
+        function startQuiz() {
+            startTime = Date.now();
+            
+            // Randomizează și selectează întrebări
+            const shuffled = [...questionBank].sort(() => Math.random() - 0.5);
+            currentQuestions = shuffled.slice(0, CONFIG.NUM_QUESTIONS);
+            
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            
+            showScreen('quizScreen');
+            displayQuestion();
+        }
+        
+        function displayQuestion() {
+            const question = currentQuestions[currentQuestionIndex];
+            
+            document.getElementById('questionCounter').textContent = 
+                `Întrebarea ${currentQuestionIndex + 1} din ${CONFIG.NUM_QUESTIONS}`;
+            
+            document.getElementById('questionText').textContent = question.q;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectOption(index);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            selectedOption = null;
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('nextBtn').textContent = 
+                currentQuestionIndex === CONFIG.NUM_QUESTIONS - 1 ? 'Finalizează' : 'Următoarea';
+        }
+        
+        function selectOption(index) {
+            selectedOption = index;
+            
+            document.querySelectorAll('.option').forEach((opt, i) => {
+                opt.classList.toggle('selected', i === index);
+            });
+            
+            document.getElementById('nextBtn').disabled = false;
+        }
+        
+        function nextQuestion() {
+            if (selectedOption === null) return;
+            
+            userAnswers.push(selectedOption);
+            
+            if (currentQuestionIndex < CONFIG.NUM_QUESTIONS - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+        
+        // ============================================
+        // RESULTS
+        // ============================================
+        
+        function finishQuiz() {
+            const score = calculateScore();
+            const tier = getTier(score);
+            const duration = Math.round((Date.now() - startTime) / 1000);
+            
+            // Marchează ca participat
+            localStorage.setItem(CONFIG.LOCAL_STORAGE_KEY, '1');
+            
+            // Trimite la backend dacă e configurat
+            if (CONFIG.BACKEND_URL) {
+                submitToBackend(score, duration);
+            }
+            
+            // Afișează rezultate
+            displayResults(score, tier);
+        }
+        
+        function calculateScore() {
+            let correct = 0;
+            currentQuestions.forEach((q, i) => {
+                if (userAnswers[i] === q.correct) {
+                    correct++;
+                }
+            });
+            return correct;
+        }
+        
+        function getTier(score) {
+            if (score === 3) return 'T1';
+            if (score === 2) return 'T2';
+            return 'T3';
+        }
+        
+        function displayResults(score, tier) {
+            showScreen('resultScreen');
+            
+            document.getElementById('scoreDisplay').textContent = `${score}/${CONFIG.NUM_QUESTIONS}`;
+            
+            const tierBadge = document.getElementById('tierBadge');
+            tierBadge.innerHTML = `<div class="tier-badge tier-${tier.toLowerCase()}">${tier}</div>`;
+            
+            const messages = {
+                'T1': 'Excelent! 🎉 Ești un expert! Mergi la zona ALBASTRĂ pentru premiul tău special!',
+                'T2': 'Foarte bine! 👏 Ești pe drumul cel bun! Vizitează zona VERDE pentru premiul tău!',
+                'T3': 'Bun început! 🌟 Continuă să înveți! Treci pe la zona PORTOCALIE pentru premiul tău!'
+            };
+            
+            document.getElementById('tierMessage').textContent = messages[tier];
+        }
+        
+        // ============================================
+        // BACKEND INTEGRATION
+        // ============================================
+        
+        function submitToBackend(score, duration) {
+            const token = document.getElementById('tokenInput').value.trim();
+            
+            const payload = {
+                token: token || null,
+                answers: userAnswers,
+                score: score,
+                ts: new Date().toISOString(),
+                duration: duration
+            };
+            
+            fetch(CONFIG.BACKEND_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Apps Script cere no-cors
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            }).catch(err => {
+                console.log('Backend submission error (expected with no-cors):', err);
+            });
+        }
+    </script>
+</body>
+</html>
