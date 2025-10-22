@@ -13,7 +13,7 @@
         
         body {
             font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -40,6 +40,31 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+        
+        .visma-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #ED1B2F;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .visma-logo {
+            height: 150px;
+            width: auto;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        
+        .codecamp-badge {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
         
         h1 {
@@ -100,13 +125,14 @@
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #ED1B2F;
             color: white;
         }
         
         .btn-primary:hover {
+            background: #D91828;
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 10px 20px rgba(237, 27, 47, 0.4);
         }
         
         .btn-primary:disabled {
@@ -151,8 +177,8 @@
         }
         
         .option.selected {
-            border-color: #667eea;
-            background: #eef2ff;
+            border-color: #ED1B2F;
+            background: #FFE8EA;
         }
         
         .result-screen {
@@ -249,10 +275,16 @@
 </head>
 <body>
     <div class="container">
+        <!-- Visma Logo Header -->
+        <div class="visma-header">
+            <img src="Visma_logo.png" alt="Visma Logo" class="visma-logo">
+            <div class="codecamp-badge">CodeCamp Quiz</div>
+        </div>
+        
         <!-- Start Screen -->
         <div id="startScreen" class="screen active">
-            <h1>🚀 CodeCamp Quiz</h1>
-            <p class="subtitle">Testează-ți cunoștințele de programare în 3 întrebări!</p>
+            <h1>🚀 Testează-ți cunoștințele</h1>
+            <p class="subtitle">3 întrebări de programare pentru a-ți evalua skillurile!</p>
             
             <div class="input-group" id="tokenInputGroup" style="display: none;">
                 <label for="tokenInput">Token (opțional):</label>
@@ -282,8 +314,8 @@
                 <div class="tier-message" id="tierMessage"></div>
                 
                 <!-- Secțiune revendicare (pentru scor > 0) -->
-                <div id="claimPrizeSection" style="margin-top: 30px; padding: 20px; background: #FEF3C7; border-radius: 12px; border: 2px solid #F59E0B;">
-                    <p style="color: #92400E; font-weight: 600; margin-bottom: 15px; font-size: 1.1em;">
+                <div id="claimPrizeSection" style="margin-top: 30px; padding: 20px; background: #FFE8EA; border-radius: 12px; border: 2px solid #ED1B2F;">
+                    <p style="color: #991B1B; font-weight: 600; margin-bottom: 15px; font-size: 1.1em;">
                         ⚠️ Atenție! Acest buton trebuie apăsat în prezența personalului de la stand pentru a confirma revendicarea premiului.
                     </p>
                     <button class="btn btn-primary" onclick="claimPrize()" style="font-size: 1.2em; padding: 15px 40px; width: 100%;">
@@ -292,11 +324,11 @@
                 </div>
                 
                 <!-- Secțiune reluare (pentru scor = 0) -->
-                <div id="retrySection" style="display: none; margin-top: 30px; padding: 20px; background: #FEE2E2; border-radius: 12px; border: 2px solid #EF4444;">
+                <div id="retrySection" style="display: none; margin-top: 30px; padding: 20px; background: #FEE2E2; border-radius: 12px; border: 2px solid #ED1B2F;">
                     <p style="color: #991B1B; font-weight: 600; margin-bottom: 15px; font-size: 1.1em;">
                         Din păcate nu ai răspuns corect la nicio întrebare. Poți încerca din nou!
                     </p>
-                    <button class="btn" onclick="retryQuiz()" style="font-size: 1.2em; padding: 15px 40px; width: 100%; background: #EF4444; color: white;">
+                    <button class="btn" onclick="retryQuiz()" style="font-size: 1.2em; padding: 15px 40px; width: 100%; background: #ED1B2F; color: white;">
                         🔄 Încearcă din nou
                     </button>
                 </div>
