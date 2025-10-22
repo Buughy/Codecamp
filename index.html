@@ -176,15 +176,15 @@
         }
         
         .tier-t1 {
-            background: #2563EB;
+            background: #EAB308; /* Galben - 1/3 */
         }
         
         .tier-t2 {
-            background: #16A34A;
+            background: #EA580C; /* Portocaliu - 2/3 */
         }
         
         .tier-t3 {
-            background: #EA580C;
+            background: #16A34A; /* Verde - 3/3 */
         }
         
         .tier-message {
@@ -280,6 +280,26 @@
                 <div class="score-display" id="scoreDisplay"></div>
                 <div id="tierBadge"></div>
                 <div class="tier-message" id="tierMessage"></div>
+                
+                <!-- Secțiune revendicare (pentru scor > 0) -->
+                <div id="claimPrizeSection" style="margin-top: 30px; padding: 20px; background: #FEF3C7; border-radius: 12px; border: 2px solid #F59E0B;">
+                    <p style="color: #92400E; font-weight: 600; margin-bottom: 15px; font-size: 1.1em;">
+                        ⚠️ Atenție! Acest buton trebuie apăsat în prezența personalului de la stand pentru a confirma revendicarea premiului.
+                    </p>
+                    <button class="btn btn-primary" onclick="claimPrize()" style="font-size: 1.2em; padding: 15px 40px; width: 100%;">
+                        🎁 Revendică Premiul
+                    </button>
+                </div>
+                
+                <!-- Secțiune reluare (pentru scor = 0) -->
+                <div id="retrySection" style="display: none; margin-top: 30px; padding: 20px; background: #FEE2E2; border-radius: 12px; border: 2px solid #EF4444;">
+                    <p style="color: #991B1B; font-weight: 600; margin-bottom: 15px; font-size: 1.1em;">
+                        Din păcate nu ai răspuns corect la nicio întrebare. Poți încerca din nou!
+                    </p>
+                    <button class="btn" onclick="retryQuiz()" style="font-size: 1.2em; padding: 15px 40px; width: 100%; background: #EF4444; color: white;">
+                        🔄 Încearcă din nou
+                    </button>
+                </div>
             </div>
         </div>
         
@@ -312,6 +332,7 @@
             LOCAL_STORAGE_KEY: 'cc_quiz_played',
             SCORE_STORAGE_KEY: 'cc_quiz_score',
             TIER_STORAGE_KEY: 'cc_quiz_tier',
+            IN_PROGRESS_KEY: 'cc_quiz_in_progress',
             USE_TOKENS: false
         };
         
@@ -324,11 +345,15 @@
             const e = "W3sicSI6ICJDZSByZXR1cm5lYXrEgyBgdHlwZW9mIG51bGxgIMOubiBKYXZhU2NyaXB0PyIsICJvcHRpb25zIjogWyInbnVsbCciLCAiJ3VuZGVmaW5lZCciLCAiJ29iamVjdCciLCAiJ251bWJlciciXSwgImMiOiAyfSwgeyJxIjogIkNlIGFmaciZZWF6xIMgYGNvbnNvbGUubG9nKDAuMSArIDAuMiA9PT0gMC4zKWAgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbInRydWUiLCAiZmFsc2UiLCAidW5kZWZpbmVkIiwgIk5hTiJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZmFjZSBgQXJyYXkucHJvdG90eXBlLm1hcCgpYCDDrm4gSmF2YVNjcmlwdD8iLCAib3B0aW9ucyI6IFsiTW9kaWZpY8SDIGFycmF5LXVsIG9yaWdpbmFsIiwgIkNyZWVhesSDIHVuIGFycmF5IG5vdSBjdSByZXp1bHRhdGVsZSBmdW5jyJtpZWkiLCAiRmlsdHJlYXrEgyBlbGVtZW50ZWxlIiwgIlNvcnRlYXrEgyBhcnJheS11bCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgdGlwIGRlIHZhcmlhYmlsxIMgTlUgcG9hdGUgZmkgcmVhc2lnbmF0xIMgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbInZhciIsICJsZXQiLCAiY29uc3QiLCAiZnVuY3Rpb24iXSwgImMiOiAyfSwgeyJxIjogIkNlIGFmaciZZWF6xIMgYGNvbnNvbGUubG9nKDEgKyAnMScpYCDDrm4gSmF2YVNjcmlwdD8iLCAib3B0aW9ucyI6IFsiMiIsICInMTEnIiwgIjExIiwgInVuZGVmaW5lZCJdLCAiYyI6IDF9LCB7InEiOiAiQ2FyZSBlIGRpZmVyZW7Im2EgcHJpbmNpcGFsxIMgw65udHJlIGA9PWAgyJlpIGA9PT1gIMOubiBKYXZhU2NyaXB0PyIsICJvcHRpb25zIjogWyJOdSBlIGRpZmVyZW7Im8SDIiwgImA9PT1gIHZlcmlmaWPEgyDImWkgdGlwdWwgZGUgZGF0ZSIsICJgPT1gIGUgbWFpIHJhcGlkIiwgImA9PT1gIGZ1bmPIm2lvbmVhesSDIGRvYXIgY3UgbnVtZXJlIl0sICJjIjogMX0sIHsicSI6ICJDZSBmYWNlIGBhc3luYy9hd2FpdGAgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbIkNyZWVhesSDIHRocmVhZC11cmkgbm9pIiwgIlNpbXBsaWZpY8SDIGx1Y3J1bCBjdSBQcm9taXNlLXVyaSIsICJPcHJlyJl0ZSBleGVjdcibaWEgcHJvZ3JhbXVsdWkiLCAiQ3JlZWF6xIMgdmFyaWFiaWxlIGFzaW5jcm9uZSJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgcmV0dXJuZWF6xIMgYFsxLCAyLCAzXS5yZWR1Y2UoKGEsIGIpID0+IGEgKyBiLCAwKWAgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbIjAiLCAiNiIsICJbMSwyLDNdIiwgInVuZGVmaW5lZCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZmFjZSBgZXZlbnQucHJldmVudERlZmF1bHQoKWAgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbIsiYdGVyZ2UgZXZlbnQtdWwiLCAiT3ByZciZdGUgY29tcG9ydGFtZW50dWwgZGVmYXVsdCBhbCBicm93c2VydWx1aSIsICJDcmVlYXrEgyB1biBldmVudCBub3UiLCAiT3ByZciZdGUgcHJvcGFnYXJlYSJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZSBvIGNsb3N1cmUgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbIk8gZnVuY8ibaWUgw65uY2hpc8SDIiwgIk8gZnVuY8ibaWUgY2FyZSByZcibaW5lIHNjb3BlLXVsIMOubiBjYXJlIGEgZm9zdCBjcmVhdMSDIiwgIk8gdmFyaWFiaWzEgyBjb25zdGFudMSDIiwgIk8gY2xhc8SDIHByaXZhdMSDIl0sICJjIjogMX0sIHsicSI6ICJDZSByZXR1cm5lYXrEgyBgISEwYCDDrm4gSmF2YVNjcmlwdD8iLCAib3B0aW9ucyI6IFsidHJ1ZSIsICJmYWxzZSIsICIwIiwgInVuZGVmaW5lZCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZmFjZSBgSlNPTi5wYXJzZSgpYCDDrm4gSmF2YVNjcmlwdD8iLCAib3B0aW9ucyI6IFsiQ29udmVydGXImXRlIHVuIG9iaWVjdCDDrm4gc3RyaW5nIiwgIkNvbnZlcnRlyJl0ZSB1biBzdHJpbmcgSlNPTiDDrm4gb2JpZWN0IiwgIlZhbGlkZWF6xIMgSlNPTiIsICJDb21wcmltxIMgSlNPTiJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgbW9kaWZpY2F0b3IgZmFjZSBvIHZhcmlhYmlsxIMgY29uc3RhbnTEgyDDrm4gSmF2YT8iLCAib3B0aW9ucyI6IFsiY29uc3QiLCAiZmluYWwiLCAic3RhdGljIiwgInJlYWRvbmx5Il0sICJjIjogMX0sIHsicSI6ICJDZSBlIG8gaW50ZXJmYcibxIMgw65uIEphdmE/IiwgIm9wdGlvbnMiOiBbIk8gY2xhc8SDIGFic3RyYWN0xIMiLCAiVW4gY29udHJhY3QgY3UgbWV0b2RlIG5laW1wbGVtZW50YXRlIiwgIlVuIHRpcCBkZSBhcnJheSIsICJPIGZ1bmPIm2llIHN0YXRpY8SDIl0sICJjIjogMX0sIHsicSI6ICJDZSBmYWNlIGtleXdvcmQtdWwgYHN0YXRpY2Agw65uIEphdmE/IiwgIm9wdGlvbnMiOiBbIkZhY2UgY2xhc2EgZmluYWzEgyIsICJGYWNlIG1lbWJydWwgc8SDIGFwYXLIm2luxIMgY2xhc2VpLCBudSBpbnN0YW7Im2VpIiwgIk9wcmXImXRlIG1vyJl0ZW5pcmVhIiwgIkZhY2UgbWV0b2RhIHByaXZhdMSDIl0sICJjIjogMX0sIHsicSI6ICJDZSB0aXAgcmV0dXJuZWF6xIMgYHZvaWRgIMOubiBKYXZhPyIsICJvcHRpb25zIjogWyJudWxsIiwgIjAiLCAiZmFsc2UiLCAiTmltaWMgKG5pY2l1biB0aXApIl0sICJjIjogM30sIHsicSI6ICJDZSBmYWNlIGBBcnJheUxpc3RgIMOubiBKYXZhPyIsICJvcHRpb25zIjogWyJDcmVlYXrEgyB1biBhcnJheSBmaXgiLCAiQ3JlZWF6xIMgbyBsaXN0xIMgZGluYW1pY8SDIiwgIlNvcnRlYXrEgyB1biBhcnJheSIsICJDcmVlYXrEgyB1biBoYXNobWFwIl0sICJjIjogMX0sIHsicSI6ICJDZSBlIHBvbGltb3JmaXNtdWwgw65uIEphdmE/IiwgIm9wdGlvbnMiOiBbIk1vyJl0ZW5pcmUgbXVsdGlwbMSDIiwgIk1haSBtdWx0ZSBmb3JtZSBhbGUgYWNlbHVpYciZaSBsdWNydSIsICJPIGludGVyZmHIm8SDIiwgIk8gY2xhc8SDIGFic3RyYWN0xIMiXSwgImMiOiAxfSwgeyJxIjogIkNlIGZhY2UgYHRyeS1jYXRjaGAgw65uIEphdmE/IiwgIm9wdGlvbnMiOiBbIk9wdGltaXplYXrEgyBjb2R1bCIsICJHZXN0aW9uZWF6xIMgZXhjZXDIm2lpbGUiLCAiQ3JlZWF6xIMgdGhyZWFkLXVyaSIsICJWYWxpZGVhesSDIGlucHV0LXVsIl0sICJjIjogMX0sIHsicSI6ICJDYXJlIGUgZGlmZXJlbsibYSDDrm50cmUgYD09YCDImWkgYC5lcXVhbHMoKWAgw65uIEphdmEgcGVudHJ1IFN0cmluZy11cmk/IiwgIm9wdGlvbnMiOiBbIk51IGUgZGlmZXJlbsibxIMiLCAiYD09YCBjb21wYXLEgyByZWZlcmluyJtlbGUsIGAuZXF1YWxzKClgIGNvbXBhcsSDIGNvbsibaW51dHVsIiwgImBlcXVhbHMoKWAgZSBtYWkgcmFwaWQiLCAiYD09YCBlIGRlcHJlY2F0ZWQiXSwgImMiOiAxfSwgeyJxIjogIkNlIGZhY2UgYGxpc3QuYXBwZW5kKClgIMOubiBQeXRob24/IiwgIm9wdGlvbnMiOiBbIsiYdGVyZ2UgdWx0aW11bCBlbGVtZW50IiwgIkFkYXVnxIMgdW4gZWxlbWVudCBsYSBmaW5hbCIsICJTb3J0ZWF6xIMgbGlzdGEiLCAiQ3JlZWF6xIMgbyBjb3BpZSJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgcmV0dXJuZWF6xIMgYGxlbihbMSwgMiwgM10pYCDDrm4gUHl0aG9uPyIsICJvcHRpb25zIjogWyIxIiwgIjIiLCAiMyIsICI2Il0sICJjIjogMn0sIHsicSI6ICJDZSBmYWNlIGByYW5nZSg1KWAgw65uIFB5dGhvbj8iLCAib3B0aW9ucyI6IFsiQ3JlZWF6xIMgWzAsMSwyLDMsNF0iLCAiQ3JlZWF6xIMgWzEsMiwzLDQsNV0iLCAiQ3JlZWF6xIMgNSIsICJDcmVlYXrEgyB1biBzdHJpbmciXSwgImMiOiAwfSwgeyJxIjogIkNlIGUgdW4gZGVjb3JhdG9yIMOubiBQeXRob24/IiwgIm9wdGlvbnMiOiBbIk8gY2xhc8SDIiwgIk8gZnVuY8ibaWUgY2FyZSBtb2RpZmljxIMgbyBhbHTEgyBmdW5jyJtpZSIsICJVbiBjb21lbnRhcml1IiwgIk8gdmFyaWFiaWzEgyBnbG9iYWzEgyJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZmFjZSBgZGljdC5nZXQoJ2tleScpYCDDrm4gUHl0aG9uPyIsICJvcHRpb25zIjogWyJBcnVuY8SDIGVyb2FyZSBkYWPEgyBudSBleGlzdMSDIiwgIlJldHVybmVhesSDIHZhbG9hcmVhIHNhdSBOb25lIiwgIsiYdGVyZ2UgY2hlaWEiLCAiTW9kaWZpY8SDIGRpY8ibaW9uYXJ1bCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgdGlwIGUgYFRydWVgIMOubiBQeXRob24/IiwgIm9wdGlvbnMiOiBbImludCIsICJzdHIiLCAiYm9vbCIsICJmbG9hdCJdLCAiYyI6IDJ9LCB7InEiOiAiQ2UgZmFjZSBgU0VMRUNUIERJU1RJTkNUYCDDrm4gU1FMPyIsICJvcHRpb25zIjogWyJTZWxlY3RlYXrEgyB0b2F0ZSByw6JuZHVyaWxlIiwgIlNlbGVjdGVhesSDIGRvYXIgcsOibmR1cmkgdW5pY2UiLCAiU29ydGVhesSDIHJlenVsdGF0ZWxlIiwgIsiYdGVyZ2UgZHVwbGljYXRlIGRpbiB0YWJlbCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgdGlwIGRlIEpPSU4gcmV0dXJuZWF6xIMgZG9hciByw6JuZHVyaWxlIGNvbXVuZSDDrm4gYW1iZWxlIHRhYmVsZT8iLCAib3B0aW9ucyI6IFsiTEVGVCBKT0lOIiwgIlJJR0hUIEpPSU4iLCAiSU5ORVIgSk9JTiIsICJPVVRFUiBKT0lOIl0sICJjIjogMn0sIHsicSI6ICJDZSBmYWNlIGNvbWFuZGEgYERFTEVURSBGUk9NIHVzZXJzIFdIRVJFIGlkPTVgIMOubiBTUUw/IiwgIm9wdGlvbnMiOiBbIsiYdGVyZ2UgdG9hdGUgcsOibmR1cmlsZSIsICLImHRlcmdlIHVzZXJ1bCBjdSBpZD01IiwgIkFjdHVhbGl6ZWF6xIMgdXNlcnVsIiwgIlNlbGVjdGVhesSDIHVzZXJ1bCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZmFjZSBgQ09VTlQoKilgIMOubiBTUUw/IiwgIm9wdGlvbnMiOiBbIsOObm11bMibZciZdGUgdmFsb3JpbGUiLCAiTnVtxINyxIMgcsOibmR1cmlsZSIsICJDYWxjdWxlYXrEgyBtZWRpYSIsICJTb3J0ZWF6xIMgZGF0ZWxlIl0sICJjIjogMX0sIHsicSI6ICJDZSBpbmRleCDDrm1idW7Eg3TEg8ibZciZdGUgcGVyZm9ybWFuyJthIHF1ZXJ5LXVyaWxvciBTUUw/IiwgIm9wdGlvbnMiOiBbIlBSSU1BUlkgS0VZIiwgIklOREVYIiwgIlVOSVFVRSIsICJUb2F0ZSB2YXJpYW50ZWxlIl0sICJjIjogM30sIHsicSI6ICJDZSBjb21wbGV4aXRhdGUgYXJlIGPEg3V0YXJlYSDDrm50ci11biBhcnJheSBuZXNvcnRhdD8iLCAib3B0aW9ucyI6IFsiTygxKSIsICJPKGxvZyBuKSIsICJPKG4pIiwgIk8obsKyKSJdLCAiYyI6IDJ9LCB7InEiOiAiQ2Ugc3RydWN0dXLEgyBkZSBkYXRlIGZvbG9zZciZdGUgcHJpbmNpcGl1bCBMSUZPPyIsICJvcHRpb25zIjogWyJRdWV1ZSIsICJTdGFjayIsICJBcnJheSIsICJUcmVlIl0sICJjIjogMX0sIHsicSI6ICJDZSBjb2QgSFRUUCDDrm5zZWFtbsSDICdOb3QgRm91bmQnPyIsICJvcHRpb25zIjogWyIyMDAiLCAiNDA0IiwgIjUwMCIsICI0MDMiXSwgImMiOiAxfSwgeyJxIjogIkNlIGZhY2UgY29tYW5kYSBgZ2l0IGNvbW1pdGAgw65uIEdpdD8iLCAib3B0aW9ucyI6IFsiVHJpbWl0ZSBzY2hpbWLEg3JpbGUgcGUgc2VydmVyIiwgIlNhbHZlYXrEgyBzY2hpbWLEg3JpbGUgbG9jYWwiLCAiQ3JlZWF6xIMgdW4gYnJhbmNoIiwgIsiYdGVyZ2UgZmnImWllcmUiXSwgImMiOiAxfSwgeyJxIjogIkNlIGUgdW4gUkVTVCBBUEk/IiwgIm9wdGlvbnMiOiBbIk8gYmF6xIMgZGUgZGF0ZSIsICJPIGFyaGl0ZWN0dXLEgyBkZSBjb211bmljYXJlIHdlYiIsICJVbiBsaW1iYWogZGUgcHJvZ3JhbWFyZSIsICJVbiBmcmFtZXdvcmsiXSwgImMiOiAxfSwgeyJxIjogIkNlIGZhY2UgYGdpdCBwdWxsYCDDrm4gR2l0PyIsICJvcHRpb25zIjogWyLImHRlcmdlIGJyYW5jaC11bCIsICJBZHVjZSB1bHRpbWVsZSBzY2hpbWLEg3JpIGRlIHBlIHNlcnZlciIsICJDcmVlYXrEgyB1biBjb21taXQiLCAiUmVzZXRlYXrEgyByZXBvc2l0b3J5LXVsIl0sICJjIjogMX0sIHsicSI6ICJDZSBjb2QgSFRUUCDDrm5zZWFtbsSDICdTdWNjZXNzJz8iLCAib3B0aW9ucyI6IFsiMTAwIiwgIjIwMCIsICIzMDAiLCAiNDAwIl0sICJjIjogMX0sIHsicSI6ICJDZSBjb21wbGV4aXRhdGUgYXJlIHNvcnRhcmVhIHByaW4gUXVpY2sgU29ydCDDrm4gbWVkaWU/IiwgIm9wdGlvbnMiOiBbIk8oMSkiLCAiTyhuKSIsICJPKG4gbG9nIG4pIiwgIk8obsKyKSJdLCAiYyI6IDJ9LCB7InEiOiAiQ2UgZSB1biBoYXNoIG1hcD8iLCAib3B0aW9ucyI6IFsiVW4gYXJyYXkiLCAiTyBzdHJ1Y3R1csSDIGN1IGNoZWllLXZhbG9hcmUiLCAiTyBsaXN0xIMiLCAiVW4gYXJib3JlIl0sICJjIjogMX1d";
             const k = [2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 2, 0, 1, 1, 2, 1, 2, 1, 1, 3, 2, 1, 1, 1, 1, 1, 1, 2, 1];
             try {
-                const d = atob(e);
-                const p = JSON.parse(d);
+                // Fix UTF-8 decoding după atob()
+                const base64Decoded = atob(e);
+                const utf8Decoded = decodeURIComponent(Array.from(base64Decoded).map(c => 
+                    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+                ).join(''));
+                const p = JSON.parse(utf8Decoded);
                 return p.map((q, i) => ({q: q.q, options: q.options, correct: k[i]}));
             } catch(err) {
-                console.error('Decode error');
+                console.error('Decode error:', err);
                 return [];
             }
         })();
@@ -348,14 +373,86 @@
         // ============================================
         
         window.onload = function() {
+            // Verifică dacă a revendicat deja premiul
             if (localStorage.getItem(CONFIG.LOCAL_STORAGE_KEY)) {
                 showAlreadyPlayedScreen();
                 return;
             }
+            
+            // Verifică dacă a terminat quiz-ul dar nu a revendicat încă
+            const savedScore = localStorage.getItem(CONFIG.SCORE_STORAGE_KEY);
+            const savedTier = localStorage.getItem(CONFIG.TIER_STORAGE_KEY);
+            
+            if (savedScore !== null && savedTier !== null) {
+                const score = parseInt(savedScore);
+                
+                // Dacă scorul = 0, șterge rezultatul și permite reluare
+                if (score === 0) {
+                    localStorage.removeItem(CONFIG.SCORE_STORAGE_KEY);
+                    localStorage.removeItem(CONFIG.TIER_STORAGE_KEY);
+                    clearQuizProgress();
+                } else {
+                    // Are scor > 0, trebuie să meargă la ecranul de revendicare
+                    displayResults(score, savedTier);
+                    return;
+                }
+            }
+            
+            // Verifică dacă are quiz în progres - continuă de unde a rămas
+            if (localStorage.getItem(CONFIG.IN_PROGRESS_KEY)) {
+                const savedState = JSON.parse(localStorage.getItem(CONFIG.IN_PROGRESS_KEY));
+                currentQuestions = savedState.questions;
+                currentQuestionIndex = savedState.currentIndex;
+                userAnswers = savedState.answers;
+                startTime = savedState.startTime;
+                showScreen('quizScreen');
+                displayQuestion();
+                return;
+            }
+            
             if (CONFIG.USE_TOKENS) {
                 document.getElementById('tokenInputGroup').style.display = 'block';
             }
         };
+        
+        function saveQuizProgress() {
+            const state = {
+                questions: currentQuestions,
+                currentIndex: currentQuestionIndex,
+                answers: userAnswers,
+                startTime: startTime
+            };
+            localStorage.setItem(CONFIG.IN_PROGRESS_KEY, JSON.stringify(state));
+        }
+        
+        function clearQuizProgress() {
+            localStorage.removeItem(CONFIG.IN_PROGRESS_KEY);
+        }
+        
+        function retryQuiz() {
+            // Șterge toate datele salvate
+            localStorage.removeItem(CONFIG.SCORE_STORAGE_KEY);
+            localStorage.removeItem(CONFIG.TIER_STORAGE_KEY);
+            clearQuizProgress();
+            
+            // Resetează variabilele
+            currentQuestions = [];
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            selectedOption = null;
+            
+            // Reîncepe de la ecranul de start
+            showScreen('startScreen');
+        }
+        
+        function claimPrize() {
+            // Marchează ca revendicat
+            localStorage.setItem(CONFIG.LOCAL_STORAGE_KEY, '1');
+            // Șterge progresul salvat
+            clearQuizProgress();
+            // Afișează ecranul "ai participat deja" cu rezultatul
+            showAlreadyPlayedScreen();
+        }
         
         function showAlreadyPlayedScreen() {
             const previousScore = localStorage.getItem(CONFIG.SCORE_STORAGE_KEY);
@@ -366,9 +463,9 @@
                 const tierBadge = document.getElementById('previousTierBadge');
                 tierBadge.innerHTML = `<div class="tier-badge tier-${previousTier.toLowerCase()}">${previousTier}</div>`;
                 const messages = {
-                    'T1': '🏆 Excelent! Mergi la zona ALBASTRĂ pentru premiul tău special!',
-                    'T2': '👏 Foarte bine! Vizitează zona VERDE pentru premiul tău!',
-                    'T3': '🌟 Bun început! Treci pe la zona PORTOCALIE pentru premiul tău!'
+                    'T1': '� Bun început! Premiul tău GALBEN!',
+                    'T2': '👏 Foarte bine! Premiul tău PORTOCALIU!',
+                    'T3': '� Excelent! Premiul tău VERDE!'
                 };
                 document.getElementById('previousTierMessage').textContent = messages[previousTier];
             } else {
@@ -401,6 +498,9 @@
             
             currentQuestionIndex = 0;
             userAnswers = [];
+            
+            // Salvează starea - quiz-ul a început!
+            saveQuizProgress();
             
             showScreen('quizScreen');
             displayQuestion();
@@ -448,6 +548,7 @@
             
             if (currentQuestionIndex < CONFIG.NUM_QUESTIONS - 1) {
                 currentQuestionIndex++;
+                saveQuizProgress(); // Salvează progresul după fiecare răspuns
                 displayQuestion();
             } else {
                 finishQuiz();
@@ -463,10 +564,12 @@
             const tier = getTier(score);
             const duration = Math.round((Date.now() - startTime) / 1000);
             
-            // Marchează ca participat și salvează rezultatul
-            localStorage.setItem(CONFIG.LOCAL_STORAGE_KEY, '1');
+            // Salvează doar rezultatul (NU marchează ca revendicat încă)
             localStorage.setItem(CONFIG.SCORE_STORAGE_KEY, score);
             localStorage.setItem(CONFIG.TIER_STORAGE_KEY, tier);
+            
+            // Quiz-ul s-a terminat - nu mai e nevoie să salvăm progresul
+            clearQuizProgress();
             
             if (CONFIG.BACKEND_URL) {
                 submitToBackend(score, duration);
@@ -486,9 +589,9 @@
         }
         
         function getTier(score) {
-            if (score === 3) return 'T1';
-            if (score === 2) return 'T2';
-            return 'T3';
+            if (score <= 1) return 'T1';  // 0-1/3 = T1 Galben
+            if (score === 2) return 'T2';  // 2/3 = T2 Portocaliu
+            return 'T3';                   // 3/3 = T3 Verde
         }
         
         function displayResults(score, tier) {
@@ -500,12 +603,26 @@
             tierBadge.innerHTML = `<div class="tier-badge tier-${tier.toLowerCase()}">${tier}</div>`;
             
             const messages = {
-                'T1': 'Excelent! 🎉 Ești un expert! Mergi la zona ALBASTRĂ pentru premiul tău special!',
-                'T2': 'Foarte bine! 👏 Ești pe drumul cel bun! Vizitează zona VERDE pentru premiul tău!',
-                'T3': 'Bun început! 🌟 Continuă să înveți! Treci pe la zona PORTOCALIE pentru premiul tău!'
+                'T1': 'Bun început! 🌟 Continuă să înveți! Mergi la stand pentru premiul tău GALBEN!',
+                'T2': 'Foarte bine! 👏 Ești pe drumul cel bun! Mergi la stand pentru premiul tău PORTOCALIU!',
+                'T3': 'Excelent! 🎉 Ai răspuns corect la toate! Mergi la stand pentru premiul tău VERDE!'
             };
             
             document.getElementById('tierMessage').textContent = messages[tier];
+            
+            // Afișează sau ascunde butonul de revendicare în funcție de scor
+            const claimSection = document.getElementById('claimPrizeSection');
+            const retrySection = document.getElementById('retrySection');
+            
+            if (score === 0) {
+                // Scor 0 - permite reluare
+                claimSection.style.display = 'none';
+                retrySection.style.display = 'block';
+            } else {
+                // Scor > 0 - afișează buton revendicare
+                claimSection.style.display = 'block';
+                retrySection.style.display = 'none';
+            }
         }
         
         // ============================================
