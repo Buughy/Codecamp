@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -283,18 +283,18 @@
         
         <!-- Start Screen -->
         <div id="startScreen" class="screen active">
-            <h1>🚀 Testează-ți cunoștințele</h1>
-            <p class="subtitle">3 întrebări de programare pentru a-ți evalua skillurile!</p>
+            <h1>🚀 Test Your Knowledge</h1>
+            <p class="subtitle">3 programming questions to evaluate your skills!</p>
             
             <div class="input-group" id="tokenInputGroup" style="display: none;">
-                <label for="tokenInput">Token (opțional):</label>
-                <input type="text" id="tokenInput" placeholder="Introdu token-ul tău unic">
+                <label for="tokenInput">Token (optional):</label>
+                <input type="text" id="tokenInput" placeholder="Enter your unique token">
                 <div class="info-message" style="margin-top: 10px;">
-                    Dacă ai primit un token, introdu-l mai sus. Altfel, poți continua fără token.
+                    If you received a token, enter it above. Otherwise, you can continue without a token.
                 </div>
             </div>
             
-            <button class="btn btn-primary" onclick="startQuiz()">Începe Quiz-ul</button>
+            <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
         </div>
         
         <!-- Quiz Screen -->
@@ -302,34 +302,34 @@
             <div class="question-counter" id="questionCounter"></div>
             <div class="question-text" id="questionText"></div>
             <div class="options" id="optionsContainer"></div>
-            <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>Următoarea</button>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>Next</button>
         </div>
         
         <!-- Result Screen -->
         <div id="resultScreen" class="screen">
             <div class="result-screen">
-                <h1>Rezultatul tău</h1>
+                <h1>Your Result</h1>
                 <div class="score-display" id="scoreDisplay"></div>
                 <div id="tierBadge"></div>
                 <div class="tier-message" id="tierMessage"></div>
                 
-                <!-- Secțiune revendicare (pentru scor > 0) -->
+                <!-- Claim prize section (for score > 0) -->
                 <div id="claimPrizeSection" style="margin-top: 30px; padding: 20px; background: #FFE8EA; border-radius: 12px; border: 2px solid #ED1B2F;">
                     <p style="color: #991B1B; font-weight: 600; margin-bottom: 15px; font-size: 1.1em;">
-                        ⚠️ Atenție! Acest buton trebuie apăsat în prezența personalului de la stand pentru a confirma revendicarea premiului.
+                        ⚠️ Attention! This button must be pressed in the presence of booth staff to confirm prize claim.
                     </p>
                     <button class="btn btn-primary" onclick="claimPrize()" style="font-size: 1.2em; padding: 15px 40px; width: 100%;">
-                        🎁 Revendică Premiul
+                        🎁 Claim Prize
                     </button>
                 </div>
                 
-                <!-- Secțiune reluare (pentru scor = 0) -->
+                <!-- Retry section (for score = 0) -->
                 <div id="retrySection" style="display: none; margin-top: 30px; padding: 20px; background: #FEE2E2; border-radius: 12px; border: 2px solid #ED1B2F;">
                     <p style="color: #991B1B; font-weight: 600; margin-bottom: 15px; font-size: 1.1em;">
-                        Din păcate nu ai răspuns corect la nicio întrebare. Poți încerca din nou!
+                        Unfortunately you didn't answer any question correctly. You can try again!
                     </p>
                     <button class="btn" onclick="retryQuiz()" style="font-size: 1.2em; padding: 15px 40px; width: 100%; background: #ED1B2F; color: white;">
-                        🔄 Încearcă din nou
+                        🔄 Try Again
                     </button>
                 </div>
             </div>
@@ -338,17 +338,17 @@
         <!-- Already Played Screen -->
         <div id="alreadyPlayedScreen" class="screen">
             <div class="already-played">
-                <h2>✅ Ai participat deja!</h2>
-                <p>Mulțumim pentru participare! Poți juca o singură dată pentru a menține competiția corectă.</p>
+                <h2>✅ You've Already Participated!</h2>
+                <p>Thank you for participating! You can only play once to keep the competition fair.</p>
                 
                 <div id="previousResultContainer" style="margin: 30px 0;">
-                    <h3 style="color: #374151; margin-bottom: 15px;">Rezultatul tău anterior:</h3>
+                    <h3 style="color: #374151; margin-bottom: 15px;">Your previous result:</h3>
                     <div class="score-display" id="previousScore" style="font-size: 3em;"></div>
                     <div id="previousTierBadge"></div>
                     <div class="tier-message" id="previousTierMessage" style="font-size: 1.1em;"></div>
                 </div>
                 
-                <p style="margin-top: 20px; font-weight: 600; color: #1f2937;">Vizitează standul pentru a-ți ridica premiul!</p>
+                <p style="margin-top: 20px; font-weight: 600; color: #1f2937;">Visit the booth to claim your prize!</p>
             </div>
         </div>
     </div>
@@ -373,8 +373,8 @@
         // ============================================
         
         const questionBank = (() => {
-            // Întrebări encodate pentru anti-cheat
-            const e = "W3sicSI6ICJDZSByZXR1cm5lYXrEgyBgdHlwZW9mIG51bGxgIMOubiBKYXZhU2NyaXB0PyIsICJvcHRpb25zIjogWyInbnVsbCciLCAiJ3VuZGVmaW5lZCciLCAiJ29iamVjdCciLCAiJ251bWJlciciXSwgImMiOiAyfSwgeyJxIjogIkNlIGFmaciZZWF6xIMgYGNvbnNvbGUubG9nKDAuMSArIDAuMiA9PT0gMC4zKWAgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbInRydWUiLCAiZmFsc2UiLCAidW5kZWZpbmVkIiwgIk5hTiJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZmFjZSBgQXJyYXkucHJvdG90eXBlLm1hcCgpYCDDrm4gSmF2YVNjcmlwdD8iLCAib3B0aW9ucyI6IFsiTW9kaWZpY8SDIGFycmF5LXVsIG9yaWdpbmFsIiwgIkNyZWVhesSDIHVuIGFycmF5IG5vdSBjdSByZXp1bHRhdGVsZSBmdW5jyJtpZWkiLCAiRmlsdHJlYXrEgyBlbGVtZW50ZWxlIiwgIlNvcnRlYXrEgyBhcnJheS11bCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgdGlwIGRlIHZhcmlhYmlsxIMgTlUgcG9hdGUgZmkgcmVhc2lnbmF0xIMgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbInZhciIsICJsZXQiLCAiY29uc3QiLCAiZnVuY3Rpb24iXSwgImMiOiAyfSwgeyJxIjogIkNlIGFmaciZZWF6xIMgYGNvbnNvbGUubG9nKDEgKyAnMScpYCDDrm4gSmF2YVNjcmlwdD8iLCAib3B0aW9ucyI6IFsiMiIsICInMTEnIiwgIjExIiwgInVuZGVmaW5lZCJdLCAiYyI6IDF9LCB7InEiOiAiQ2FyZSBlIGRpZmVyZW7Im2EgcHJpbmNpcGFsxIMgw65udHJlIGA9PWAgyJlpIGA9PT1gIMOubiBKYXZhU2NyaXB0PyIsICJvcHRpb25zIjogWyJOdSBlIGRpZmVyZW7Im8SDIiwgImA9PT1gIHZlcmlmaWPEgyDImWkgdGlwdWwgZGUgZGF0ZSIsICJgPT1gIGUgbWFpIHJhcGlkIiwgImA9PT1gIGZ1bmPIm2lvbmVhesSDIGRvYXIgY3UgbnVtZXJlIl0sICJjIjogMX0sIHsicSI6ICJDZSBmYWNlIGBhc3luYy9hd2FpdGAgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbIkNyZWVhesSDIHRocmVhZC11cmkgbm9pIiwgIlNpbXBsaWZpY8SDIGx1Y3J1bCBjdSBQcm9taXNlLXVyaSIsICJPcHJlyJl0ZSBleGVjdcibaWEgcHJvZ3JhbXVsdWkiLCAiQ3JlZWF6xIMgdmFyaWFiaWxlIGFzaW5jcm9uZSJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgcmV0dXJuZWF6xIMgYFsxLCAyLCAzXS5yZWR1Y2UoKGEsIGIpID0+IGEgKyBiLCAwKWAgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbIjAiLCAiNiIsICJbMSwyLDNdIiwgInVuZGVmaW5lZCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZmFjZSBgZXZlbnQucHJldmVudERlZmF1bHQoKWAgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbIsiYdGVyZ2UgZXZlbnQtdWwiLCAiT3ByZciZdGUgY29tcG9ydGFtZW50dWwgZGVmYXVsdCBhbCBicm93c2VydWx1aSIsICJDcmVlYXrEgyB1biBldmVudCBub3UiLCAiT3ByZciZdGUgcHJvcGFnYXJlYSJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZSBvIGNsb3N1cmUgw65uIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbIk8gZnVuY8ibaWUgw65uY2hpc8SDIiwgIk8gZnVuY8ibaWUgY2FyZSByZcibaW5lIHNjb3BlLXVsIMOubiBjYXJlIGEgZm9zdCBjcmVhdMSDIiwgIk8gdmFyaWFiaWzEgyBjb25zdGFudMSDIiwgIk8gY2xhc8SDIHByaXZhdMSDIl0sICJjIjogMX0sIHsicSI6ICJDZSByZXR1cm5lYXrEgyBgISEwYCDDrm4gSmF2YVNjcmlwdD8iLCAib3B0aW9ucyI6IFsidHJ1ZSIsICJmYWxzZSIsICIwIiwgInVuZGVmaW5lZCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZmFjZSBgSlNPTi5wYXJzZSgpYCDDrm4gSmF2YVNjcmlwdD8iLCAib3B0aW9ucyI6IFsiQ29udmVydGXImXRlIHVuIG9iaWVjdCDDrm4gc3RyaW5nIiwgIkNvbnZlcnRlyJl0ZSB1biBzdHJpbmcgSlNPTiDDrm4gb2JpZWN0IiwgIlZhbGlkZWF6xIMgSlNPTiIsICJDb21wcmltxIMgSlNPTiJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgbW9kaWZpY2F0b3IgZmFjZSBvIHZhcmlhYmlsxIMgY29uc3RhbnTEgyDDrm4gSmF2YT8iLCAib3B0aW9ucyI6IFsiY29uc3QiLCAiZmluYWwiLCAic3RhdGljIiwgInJlYWRvbmx5Il0sICJjIjogMX0sIHsicSI6ICJDZSBlIG8gaW50ZXJmYcibxIMgw65uIEphdmE/IiwgIm9wdGlvbnMiOiBbIk8gY2xhc8SDIGFic3RyYWN0xIMiLCAiVW4gY29udHJhY3QgY3UgbWV0b2RlIG5laW1wbGVtZW50YXRlIiwgIlVuIHRpcCBkZSBhcnJheSIsICJPIGZ1bmPIm2llIHN0YXRpY8SDIl0sICJjIjogMX0sIHsicSI6ICJDZSBmYWNlIGtleXdvcmQtdWwgYHN0YXRpY2Agw65uIEphdmE/IiwgIm9wdGlvbnMiOiBbIkZhY2UgY2xhc2EgZmluYWzEgyIsICJGYWNlIG1lbWJydWwgc8SDIGFwYXLIm2luxIMgY2xhc2VpLCBudSBpbnN0YW7Im2VpIiwgIk9wcmXImXRlIG1vyJl0ZW5pcmVhIiwgIkZhY2UgbWV0b2RhIHByaXZhdMSDIl0sICJjIjogMX0sIHsicSI6ICJDZSB0aXAgcmV0dXJuZWF6xIMgYHZvaWRgIMOubiBKYXZhPyIsICJvcHRpb25zIjogWyJudWxsIiwgIjAiLCAiZmFsc2UiLCAiTmltaWMgKG5pY2l1biB0aXApIl0sICJjIjogM30sIHsicSI6ICJDZSBmYWNlIGBBcnJheUxpc3RgIMOubiBKYXZhPyIsICJvcHRpb25zIjogWyJDcmVlYXrEgyB1biBhcnJheSBmaXgiLCAiQ3JlZWF6xIMgbyBsaXN0xIMgZGluYW1pY8SDIiwgIlNvcnRlYXrEgyB1biBhcnJheSIsICJDcmVlYXrEgyB1biBoYXNobWFwIl0sICJjIjogMX0sIHsicSI6ICJDZSBlIHBvbGltb3JmaXNtdWwgw65uIEphdmE/IiwgIm9wdGlvbnMiOiBbIk1vyJl0ZW5pcmUgbXVsdGlwbMSDIiwgIk1haSBtdWx0ZSBmb3JtZSBhbGUgYWNlbHVpYciZaSBsdWNydSIsICJPIGludGVyZmHIm8SDIiwgIk8gY2xhc8SDIGFic3RyYWN0xIMiXSwgImMiOiAxfSwgeyJxIjogIkNlIGZhY2UgYHRyeS1jYXRjaGAgw65uIEphdmE/IiwgIm9wdGlvbnMiOiBbIk9wdGltaXplYXrEgyBjb2R1bCIsICJHZXN0aW9uZWF6xIMgZXhjZXDIm2lpbGUiLCAiQ3JlZWF6xIMgdGhyZWFkLXVyaSIsICJWYWxpZGVhesSDIGlucHV0LXVsIl0sICJjIjogMX0sIHsicSI6ICJDYXJlIGUgZGlmZXJlbsibYSDDrm50cmUgYD09YCDImWkgYC5lcXVhbHMoKWAgw65uIEphdmEgcGVudHJ1IFN0cmluZy11cmk/IiwgIm9wdGlvbnMiOiBbIk51IGUgZGlmZXJlbsibxIMiLCAiYD09YCBjb21wYXLEgyByZWZlcmluyJtlbGUsIGAuZXF1YWxzKClgIGNvbXBhcsSDIGNvbsibaW51dHVsIiwgImBlcXVhbHMoKWAgZSBtYWkgcmFwaWQiLCAiYD09YCBlIGRlcHJlY2F0ZWQiXSwgImMiOiAxfSwgeyJxIjogIkNlIGZhY2UgYGxpc3QuYXBwZW5kKClgIMOubiBQeXRob24/IiwgIm9wdGlvbnMiOiBbIsiYdGVyZ2UgdWx0aW11bCBlbGVtZW50IiwgIkFkYXVnxIMgdW4gZWxlbWVudCBsYSBmaW5hbCIsICJTb3J0ZWF6xIMgbGlzdGEiLCAiQ3JlZWF6xIMgbyBjb3BpZSJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgcmV0dXJuZWF6xIMgYGxlbihbMSwgMiwgM10pYCDDrm4gUHl0aG9uPyIsICJvcHRpb25zIjogWyIxIiwgIjIiLCAiMyIsICI2Il0sICJjIjogMn0sIHsicSI6ICJDZSBmYWNlIGByYW5nZSg1KWAgw65uIFB5dGhvbj8iLCAib3B0aW9ucyI6IFsiQ3JlZWF6xIMgWzAsMSwyLDMsNF0iLCAiQ3JlZWF6xIMgWzEsMiwzLDQsNV0iLCAiQ3JlZWF6xIMgNSIsICJDcmVlYXrEgyB1biBzdHJpbmciXSwgImMiOiAwfSwgeyJxIjogIkNlIGUgdW4gZGVjb3JhdG9yIMOubiBQeXRob24/IiwgIm9wdGlvbnMiOiBbIk8gY2xhc8SDIiwgIk8gZnVuY8ibaWUgY2FyZSBtb2RpZmljxIMgbyBhbHTEgyBmdW5jyJtpZSIsICJVbiBjb21lbnRhcml1IiwgIk8gdmFyaWFiaWzEgyBnbG9iYWzEgyJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZmFjZSBgZGljdC5nZXQoJ2tleScpYCDDrm4gUHl0aG9uPyIsICJvcHRpb25zIjogWyJBcnVuY8SDIGVyb2FyZSBkYWPEgyBudSBleGlzdMSDIiwgIlJldHVybmVhesSDIHZhbG9hcmVhIHNhdSBOb25lIiwgIsiYdGVyZ2UgY2hlaWEiLCAiTW9kaWZpY8SDIGRpY8ibaW9uYXJ1bCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgdGlwIGUgYFRydWVgIMOubiBQeXRob24/IiwgIm9wdGlvbnMiOiBbImludCIsICJzdHIiLCAiYm9vbCIsICJmbG9hdCJdLCAiYyI6IDJ9LCB7InEiOiAiQ2UgZmFjZSBgU0VMRUNUIERJU1RJTkNUYCDDrm4gU1FMPyIsICJvcHRpb25zIjogWyJTZWxlY3RlYXrEgyB0b2F0ZSByw6JuZHVyaWxlIiwgIlNlbGVjdGVhesSDIGRvYXIgcsOibmR1cmkgdW5pY2UiLCAiU29ydGVhesSDIHJlenVsdGF0ZWxlIiwgIsiYdGVyZ2UgZHVwbGljYXRlIGRpbiB0YWJlbCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgdGlwIGRlIEpPSU4gcmV0dXJuZWF6xIMgZG9hciByw6JuZHVyaWxlIGNvbXVuZSDDrm4gYW1iZWxlIHRhYmVsZT8iLCAib3B0aW9ucyI6IFsiTEVGVCBKT0lOIiwgIlJJR0hUIEpPSU4iLCAiSU5ORVIgSk9JTiIsICJPVVRFUiBKT0lOIl0sICJjIjogMn0sIHsicSI6ICJDZSBmYWNlIGNvbWFuZGEgYERFTEVURSBGUk9NIHVzZXJzIFdIRVJFIGlkPTVgIMOubiBTUUw/IiwgIm9wdGlvbnMiOiBbIsiYdGVyZ2UgdG9hdGUgcsOibmR1cmlsZSIsICLImHRlcmdlIHVzZXJ1bCBjdSBpZD01IiwgIkFjdHVhbGl6ZWF6xIMgdXNlcnVsIiwgIlNlbGVjdGVhesSDIHVzZXJ1bCJdLCAiYyI6IDF9LCB7InEiOiAiQ2UgZmFjZSBgQ09VTlQoKilgIMOubiBTUUw/IiwgIm9wdGlvbnMiOiBbIsOObm11bMibZciZdGUgdmFsb3JpbGUiLCAiTnVtxINyxIMgcsOibmR1cmlsZSIsICJDYWxjdWxlYXrEgyBtZWRpYSIsICJTb3J0ZWF6xIMgZGF0ZWxlIl0sICJjIjogMX0sIHsicSI6ICJDZSBpbmRleCDDrm1idW7Eg3TEg8ibZciZdGUgcGVyZm9ybWFuyJthIHF1ZXJ5LXVyaWxvciBTUUw/IiwgIm9wdGlvbnMiOiBbIlBSSU1BUlkgS0VZIiwgIklOREVYIiwgIlVOSVFVRSIsICJUb2F0ZSB2YXJpYW50ZWxlIl0sICJjIjogM30sIHsicSI6ICJDZSBjb21wbGV4aXRhdGUgYXJlIGPEg3V0YXJlYSDDrm50ci11biBhcnJheSBuZXNvcnRhdD8iLCAib3B0aW9ucyI6IFsiTygxKSIsICJPKGxvZyBuKSIsICJPKG4pIiwgIk8obsKyKSJdLCAiYyI6IDJ9LCB7InEiOiAiQ2Ugc3RydWN0dXLEgyBkZSBkYXRlIGZvbG9zZciZdGUgcHJpbmNpcGl1bCBMSUZPPyIsICJvcHRpb25zIjogWyJRdWV1ZSIsICJTdGFjayIsICJBcnJheSIsICJUcmVlIl0sICJjIjogMX0sIHsicSI6ICJDZSBjb2QgSFRUUCDDrm5zZWFtbsSDICdOb3QgRm91bmQnPyIsICJvcHRpb25zIjogWyIyMDAiLCAiNDA0IiwgIjUwMCIsICI0MDMiXSwgImMiOiAxfSwgeyJxIjogIkNlIGZhY2UgY29tYW5kYSBgZ2l0IGNvbW1pdGAgw65uIEdpdD8iLCAib3B0aW9ucyI6IFsiVHJpbWl0ZSBzY2hpbWLEg3JpbGUgcGUgc2VydmVyIiwgIlNhbHZlYXrEgyBzY2hpbWLEg3JpbGUgbG9jYWwiLCAiQ3JlZWF6xIMgdW4gYnJhbmNoIiwgIsiYdGVyZ2UgZmnImWllcmUiXSwgImMiOiAxfSwgeyJxIjogIkNlIGUgdW4gUkVTVCBBUEk/IiwgIm9wdGlvbnMiOiBbIk8gYmF6xIMgZGUgZGF0ZSIsICJPIGFyaGl0ZWN0dXLEgyBkZSBjb211bmljYXJlIHdlYiIsICJVbiBsaW1iYWogZGUgcHJvZ3JhbWFyZSIsICJVbiBmcmFtZXdvcmsiXSwgImMiOiAxfSwgeyJxIjogIkNlIGZhY2UgYGdpdCBwdWxsYCDDrm4gR2l0PyIsICJvcHRpb25zIjogWyLImHRlcmdlIGJyYW5jaC11bCIsICJBZHVjZSB1bHRpbWVsZSBzY2hpbWLEg3JpIGRlIHBlIHNlcnZlciIsICJDcmVlYXrEgyB1biBjb21taXQiLCAiUmVzZXRlYXrEgyByZXBvc2l0b3J5LXVsIl0sICJjIjogMX0sIHsicSI6ICJDZSBjb2QgSFRUUCDDrm5zZWFtbsSDICdTdWNjZXNzJz8iLCAib3B0aW9ucyI6IFsiMTAwIiwgIjIwMCIsICIzMDAiLCAiNDAwIl0sICJjIjogMX0sIHsicSI6ICJDZSBjb21wbGV4aXRhdGUgYXJlIHNvcnRhcmVhIHByaW4gUXVpY2sgU29ydCDDrm4gbWVkaWU/IiwgIm9wdGlvbnMiOiBbIk8oMSkiLCAiTyhuKSIsICJPKG4gbG9nIG4pIiwgIk8obsKyKSJdLCAiYyI6IDJ9LCB7InEiOiAiQ2UgZSB1biBoYXNoIG1hcD8iLCAib3B0aW9ucyI6IFsiVW4gYXJyYXkiLCAiTyBzdHJ1Y3R1csSDIGN1IGNoZWllLXZhbG9hcmUiLCAiTyBsaXN0xIMiLCAiVW4gYXJib3JlIl0sICJjIjogMX1d";
+            // Encoded questions for anti-cheat
+            const e = "W3sicSI6ICJXaGF0IGRvZXMgYHR5cGVvZiBudWxsYCByZXR1cm4gaW4gSmF2YVNjcmlwdD8iLCAib3B0aW9ucyI6IFsiJ251bGwnIiwgIid1bmRlZmluZWQnIiwgIidvYmplY3QnIiwgIidudW1iZXInIl0sICJjIjogMn0sIHsicSI6ICJXaGF0IGRvZXMgYGNvbnNvbGUubG9nKDAuMSArIDAuMiA9PT0gMC4zKWAgZGlzcGxheSBpbiBKYXZhU2NyaXB0PyIsICJvcHRpb25zIjogWyJ0cnVlIiwgImZhbHNlIiwgInVuZGVmaW5lZCIsICJOYU4iXSwgImMiOiAxfSwgeyJxIjogIldoYXQgZG9lcyBgQXJyYXkucHJvdG90eXBlLm1hcCgpYCBkbyBpbiBKYXZhU2NyaXB0PyIsICJvcHRpb25zIjogWyJNb2RpZmllcyB0aGUgb3JpZ2luYWwgYXJyYXkiLCAiQ3JlYXRlcyBhIG5ldyBhcnJheSB3aXRoIGZ1bmN0aW9uIHJlc3VsdHMiLCAiRmlsdGVycyBlbGVtZW50cyIsICJTb3J0cyB0aGUgYXJyYXkiXSwgImMiOiAxfSwgeyJxIjogIldoYXQgdHlwZSBvZiB2YXJpYWJsZSBDQU5OT1QgYmUgcmVhc3NpZ25lZCBpbiBKYXZhU2NyaXB0PyIsICJvcHRpb25zIjogWyJ2YXIiLCAibGV0IiwgImNvbnN0IiwgImZ1bmN0aW9uIl0sICJjIjogMn0sIHsicSI6ICJXaGF0IGRvZXMgYGNvbnNvbGUubG9nKDEgKyAnMScpYCBkaXNwbGF5IGluIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbIjIiLCAiJzExJyIsICIxMSIsICJ1bmRlZmluZWQiXSwgImMiOiAxfSwgeyJxIjogIldoYXQncyB0aGUgbWFpbiBkaWZmZXJlbmNlIGJldHdlZW4gYD09YCBhbmQgYD09PWAgaW4gSmF2YVNjcmlwdD8iLCAib3B0aW9ucyI6IFsiVGhlcmUgaXMgbm8gZGlmZmVyZW5jZSIsICJgPT09YCBhbHNvIGNoZWNrcyB0eXBlIiwgImA9PWAgaXMgZmFzdGVyIiwgImA9PT1gIG9ubHkgd29ya3Mgd2l0aCBudW1iZXJzIl0sICJjIjogMX0sIHsicSI6ICJXaGF0IGRvZXMgYGFzeW5jL2F3YWl0YCBkbyBpbiBKYXZhU2NyaXB0PyIsICJvcHRpb25zIjogWyJDcmVhdGVzIG5ldyB0aHJlYWRzIiwgIlNpbXBsaWZpZXMgd29ya2luZyB3aXRoIFByb21pc2VzIiwgIlN0b3BzIHByb2dyYW0gZXhlY3V0aW9uIiwgIkNyZWF0ZXMgYXN5bmMgdmFyaWFibGVzIl0sICJjIjogMX0sIHsicSI6ICJXaGF0IGRvZXMgYFsxLCAyLCAzXS5yZWR1Y2UoKGEsIGIpID0+IGEgKyBiLCAwKWAgcmV0dXJuIGluIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbIjAiLCAiNiIsICJbMSwyLDNdIiwgInVuZGVmaW5lZCJdLCAiYyI6IDF9LCB7InEiOiAiV2hhdCBkb2VzIGBldmVudC5wcmV2ZW50RGVmYXVsdCgpYCBkbyBpbiBKYXZhU2NyaXB0PyIsICJvcHRpb25zIjogWyJEZWxldGVzIHRoZSBldmVudCIsICJQcmV2ZW50cyBkZWZhdWx0IGJyb3dzZXIgYmVoYXZpb3IiLCAiQ3JlYXRlcyBhIG5ldyBldmVudCIsICJTdG9wcyBwcm9wYWdhdGlvbiJdLCAiYyI6IDF9LCB7InEiOiAiV2hhdCBpcyBhIGNsb3N1cmUgaW4gSmF2YVNjcmlwdD8iLCAib3B0aW9ucyI6IFsiQSBjbG9zZWQgZnVuY3Rpb24iLCAiQSBmdW5jdGlvbiB0aGF0IHJldGFpbnMgdGhlIHNjb3BlIGluIHdoaWNoIGl0IHdhcyBjcmVhdGVkIiwgIkEgY29uc3RhbnQgdmFyaWFibGUiLCAiQSBwcml2YXRlIGNsYXNzIl0sICJjIjogMX0sIHsicSI6ICJXaGF0IGRvZXMgYCEhMGAgcmV0dXJuIGluIEphdmFTY3JpcHQ/IiwgIm9wdGlvbnMiOiBbInRydWUiLCAiZmFsc2UiLCAiMCIsICJ1bmRlZmluZWQiXSwgImMiOiAxfSwgeyJxIjogIldoYXQgZG9lcyBgSlNPTi5wYXJzZSgpYCBkbyBpbiBKYXZhU2NyaXB0PyIsICJvcHRpb25zIjogWyJDb252ZXJ0cyBhbiBvYmplY3QgdG8gYSBzdHJpbmciLCAiQ29udmVydHMgYSBKU09OIHN0cmluZyB0byBhbiBvYmplY3QiLCAiVmFsaWRhdGVzIEpTT04iLCAiQ29tcHJlc3NlcyBKU09OIl0sICJjIjogMX0sIHsicSI6ICJXaGF0IG1vZGlmaWVyIG1ha2VzIGEgdmFyaWFibGUgY29uc3RhbnQgaW4gSmF2YT8iLCAib3B0aW9ucyI6IFsiY29uc3QiLCAiZmluYWwiLCAic3RhdGljIiwgInJlYWRvbmx5Il0sICJjIjogMX0sIHsicSI6ICJXaGF0IGlzIGFuIGludGVyZmFjZSBpbiBKYXZhPyIsICJvcHRpb25zIjogWyJBbiBhYnN0cmFjdCBjbGFzcyIsICJBIGNvbnRyYWN0IHdpdGggdW5pbXBsZW1lbnRlZCBtZXRob2RzIiwgIkFuIGFycmF5IHR5cGUiLCAiQSBzdGF0aWMgZnVuY3Rpb24iXSwgImMiOiAxfSwgeyJxIjogIldoYXQgZG9lcyB0aGUgYHN0YXRpY2Aga2V5d29yZCBkbyBpbiBKYXZhPyIsICJvcHRpb25zIjogWyJNYWtlcyB0aGUgY2xhc3MgZmluYWwiLCAiTWFrZXMgdGhlIG1lbWJlciBiZWxvbmcgdG8gdGhlIGNsYXNzLCBub3QgdGhlIGluc3RhbmNlIiwgIlByZXZlbnRzIGluaGVyaXRhbmNlIiwgIk1ha2VzIHRoZSBtZXRob2QgcHJpdmF0ZSJdLCAiYyI6IDF9LCB7InEiOiAiV2hhdCB0eXBlIGRvZXMgYHZvaWRgIHJldHVybiBpbiBKYXZhPyIsICJvcHRpb25zIjogWyJudWxsIiwgIjAiLCAiZmFsc2UiLCAiTm90aGluZyAobm8gdHlwZSkiXSwgImMiOiAzfSwgeyJxIjogIldoYXQgZG9lcyBgQXJyYXlMaXN0YCBkbyBpbiBKYXZhPyIsICJvcHRpb25zIjogWyJDcmVhdGVzIGEgZml4ZWQgYXJyYXkiLCAiQ3JlYXRlcyBhIGR5bmFtaWMgbGlzdCIsICJTb3J0cyBhbiBhcnJheSIsICJDcmVhdGVzIGEgaGFzaG1hcCJdLCAiYyI6IDF9LCB7InEiOiAiV2hhdCBpcyBwb2x5bW9ycGhpc20gaW4gSmF2YT8iLCAib3B0aW9ucyI6IFsiTXVsdGlwbGUgaW5oZXJpdGFuY2UiLCAiTXVsdGlwbGUgZm9ybXMgb2YgdGhlIHNhbWUgdGhpbmciLCAiQW4gaW50ZXJmYWNlIiwgIkFuIGFic3RyYWN0IGNsYXNzIl0sICJjIjogMX0sIHsicSI6ICJXaGF0IGRvZXMgYHRyeS1jYXRjaGAgZG8gaW4gSmF2YT8iLCAib3B0aW9ucyI6IFsiT3B0aW1pemVzIGNvZGUiLCAiSGFuZGxlcyBleGNlcHRpb25zIiwgIkNyZWF0ZXMgdGhyZWFkcyIsICJWYWxpZGF0ZXMgaW5wdXQiXSwgImMiOiAxfSwgeyJxIjogIldoYXQncyB0aGUgZGlmZmVyZW5jZSBiZXR3ZWVuIGA9PWAgYW5kIGAuZXF1YWxzKClgIGluIEphdmEgZm9yIFN0cmluZ3M/IiwgIm9wdGlvbnMiOiBbIlRoZXJlIGlzIG5vIGRpZmZlcmVuY2UiLCAiYD09YCBjb21wYXJlcyByZWZlcmVuY2VzLCBgLmVxdWFscygpYCBjb21wYXJlcyBjb250ZW50IiwgImAuZXF1YWxzKClgIGlzIGZhc3RlciIsICJgPT1gIGlzIGRlcHJlY2F0ZWQiXSwgImMiOiAxfSwgeyJxIjogIldoYXQgZG9lcyBgbGlzdC5hcHBlbmQoKWAgZG8gaW4gUHl0aG9uPyIsICJvcHRpb25zIjogWyJEZWxldGVzIHRoZSBsYXN0IGVsZW1lbnQiLCAiQWRkcyBhbiBlbGVtZW50IGF0IHRoZSBlbmQiLCAiU29ydHMgdGhlIGxpc3QiLCAiQ3JlYXRlcyBhIGNvcHkiXSwgImMiOiAxfSwgeyJxIjogIldoYXQgZG9lcyBgbGVuKFsxLCAyLCAzXSlgIHJldHVybiBpbiBQeXRob24/IiwgIm9wdGlvbnMiOiBbIjEiLCAiMiIsICIzIiwgIjYiXSwgImMiOiAyfSwgeyJxIjogIldoYXQgZG9lcyBgcmFuZ2UoNSlgIGRvIGluIFB5dGhvbj8iLCAib3B0aW9ucyI6IFsiQ3JlYXRlcyBbMCwxLDIsMyw0XSIsICJDcmVhdGVzIFsxLDIsMyw0LDVdIiwgIkNyZWF0ZXMgNSIsICJDcmVhdGVzIGEgc3RyaW5nIl0sICJjIjogMH0sIHsicSI6ICJXaGF0IGlzIGEgZGVjb3JhdG9yIGluIFB5dGhvbj8iLCAib3B0aW9ucyI6IFsiQSBjbGFzcyIsICJBIGZ1bmN0aW9uIHRoYXQgbW9kaWZpZXMgYW5vdGhlciBmdW5jdGlvbiIsICJBIGNvbW1lbnQiLCAiQSBnbG9iYWwgdmFyaWFibGUiXSwgImMiOiAxfSwgeyJxIjogIldoYXQgZG9lcyBgZGljdC5nZXQoJ2tleScpYCBkbyBpbiBQeXRob24/IiwgIm9wdGlvbnMiOiBbIlRocm93cyBhbiBlcnJvciBpZiBrZXkgZG9lc24ndCBleGlzdCIsICJSZXR1cm5zIHRoZSB2YWx1ZSBvciBOb25lIiwgIkRlbGV0ZXMgdGhlIGtleSIsICJNb2RpZmllcyB0aGUgZGljdGlvbmFyeSJdLCAiYyI6IDF9LCB7InEiOiAiV2hhdCB0eXBlIGlzIGBUcnVlYCBpbiBQeXRob24/IiwgIm9wdGlvbnMiOiBbImludCIsICJzdHIiLCAiYm9vbCIsICJmbG9hdCJdLCAiYyI6IDJ9LCB7InEiOiAiV2hhdCBkb2VzIGBTRUxFQ1QgRElTVElOQ1RgIGRvIGluIFNRTD8iLCAib3B0aW9ucyI6IFsiU2VsZWN0cyBhbGwgcm93cyIsICJTZWxlY3RzIG9ubHkgdW5pcXVlIHJvd3MiLCAiU29ydHMgdGhlIHJlc3VsdHMiLCAiRGVsZXRlcyBkdXBsaWNhdGVzIGZyb20gdGhlIHRhYmxlIl0sICJjIjogMX0sIHsicSI6ICJXaGF0IHR5cGUgb2YgSk9JTiByZXR1cm5zIG9ubHkgY29tbW9uIHJvd3MgZnJvbSBib3RoIHRhYmxlcz8iLCAib3B0aW9ucyI6IFsiTEVGVCBKT0lOIiwgIlJJR0hUIEpPSU4iLCAiSU5ORVIgSk9JTiIsICJPVVRFUiBKT0lOIl0sICJjIjogMn0sIHsicSI6ICJXaGF0IGRvZXMgdGhlIGNvbW1hbmQgYERFTEVURSBGUk9NIHVzZXJzIFdIRVJFIGlkPTVgIGRvIGluIFNRTD8iLCAib3B0aW9ucyI6IFsiRGVsZXRlcyBhbGwgcm93cyIsICJEZWxldGVzIHRoZSB1c2VyIHdpdGggaWQ9NSIsICJVcGRhdGVzIHRoZSB1c2VyIiwgIlNlbGVjdHMgdGhlIHVzZXIiXSwgImMiOiAxfSwgeyJxIjogIldoYXQgZG9lcyBgQ09VTlQoKilgIGRvIGluIFNRTD8iLCAib3B0aW9ucyI6IFsiTXVsdGlwbGllcyB2YWx1ZXMiLCAiQ291bnRzIHRoZSBudW1iZXIgb2Ygcm93cyIsICJDYWxjdWxhdGVzIHRoZSBhdmVyYWdlIiwgIlNvcnRzIHRoZSBkYXRhIl0sICJjIjogMX0sIHsicSI6ICJXaGF0IGluZGV4IGltcHJvdmVzIFNRTCBxdWVyeSBwZXJmb3JtYW5jZT8iLCAib3B0aW9ucyI6IFsiUFJJTUFSWSBLRVkiLCAiSU5ERVgiLCAiVU5JUVVFIiwgIkFsbCB2YXJpYW50cyJdLCAiYyI6IDN9LCB7InEiOiAiV2hhdCBpcyB0aGUgdGltZSBjb21wbGV4aXR5IG9mIHNlYXJjaGluZyBhbiB1bnNvcnRlZCBhcnJheT8iLCAib3B0aW9ucyI6IFsiTygxKSIsICJPKGxvZyBuKSIsICJPKG4pIiwgIk8obsKyKSJdLCAiYyI6IDJ9LCB7InEiOiAiV2hhdCBkYXRhIHN0cnVjdHVyZSBmb2xsb3dzIHRoZSBMSUZPIHByaW5jaXBsZT8iLCAib3B0aW9ucyI6IFsiUXVldWUiLCAiU3RhY2siLCAiQXJyYXkiLCAiVHJlZSJdLCAiYyI6IDF9LCB7InEiOiAiV2hhdCBIVFRQIGNvZGUgbWVhbnMgJ05vdCBGb3VuZCc/IiwgIm9wdGlvbnMiOiBbIjIwMCIsICI0MDQiLCAiNTAwIiwgIjQwMyJdLCAiYyI6IDF9LCB7InEiOiAiV2hhdCBkb2VzIGBnaXQgY29tbWl0YCBkbyBpbiBHaXQ/IiwgIm9wdGlvbnMiOiBbIlNlbmRzIGNoYW5nZXMgdG8gdGhlIHNlcnZlciIsICJTYXZlcyBjaGFuZ2VzIGxvY2FsbHkiLCAiQ3JlYXRlcyBhIGJyYW5jaCIsICJEZWxldGVzIGEgZmlsZSJdLCAiYyI6IDF9LCB7InEiOiAiV2hhdCBpcyBhIFJFU1QgQVBJPyIsICJvcHRpb25zIjogWyJBIGRhdGFiYXNlIiwgIkEgd2ViIGNvbW11bmljYXRpb24gYXJjaGl0ZWN0dXJlIiwgIkEgcHJvZ3JhbW1pbmcgbGFuZ3VhZ2UiLCAiQSBmcmFtZXdvcmsiXSwgImMiOiAxfSwgeyJxIjogIldoYXQgZG9lcyBgZ2l0IHB1bGxgIGRvIGluIEdpdD8iLCAib3B0aW9ucyI6IFsiRGVsZXRlcyB0aGUgYnJhbmNoIiwgIkZldGNoZXMgdGhlIGxhdGVzdCBjaGFuZ2VzIGZyb20gdGhlIHNlcnZlciIsICJDcmVhdGVzIGEgY29tbWl0IiwgIlJlc2V0cyB0aGUgcmVwb3NpdG9yeSJdLCAiYyI6IDF9LCB7InEiOiAiV2hhdCBIVFRQIGNvZGUgbWVhbnMgJ1N1Y2Nlc3MnPyIsICJvcHRpb25zIjogWyIxMDAiLCAiMjAwIiwgIjMwMCIsICI0MDAiXSwgImMiOiAxfSwgeyJxIjogIldoYXQgaXMgdGhlIGF2ZXJhZ2UgY29tcGxleGl0eSBvZiBRdWljayBTb3J0PyIsICJvcHRpb25zIjogWyJPKDEpIiwgIk8obikiLCAiTyhuIGxvZyBuKSIsICJPKG7CsikiXSwgImMiOiAyfSwgeyJxIjogIldoYXQgaXMgYSBoYXNoIG1hcD8iLCAib3B0aW9ucyI6IFsiQW4gYXJyYXkiLCAiQSBrZXktdmFsdWUgc3RydWN0dXJlIiwgIkEgbGlzdCIsICJBIHRyZWUiXSwgImMiOiAxfV0=";
             const k = [2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 2, 0, 1, 1, 2, 1, 2, 1, 1, 3, 2, 1, 1, 1, 1, 1, 1, 2, 1];
             try {
                 // Fix UTF-8 decoding după atob()
@@ -495,9 +495,9 @@
                 const tierBadge = document.getElementById('previousTierBadge');
                 tierBadge.innerHTML = `<div class="tier-badge tier-${previousTier.toLowerCase()}">${previousTier}</div>`;
                 const messages = {
-                    'T1': '� Bun început! Premiul tău GALBEN!',
-                    'T2': '👏 Foarte bine! Premiul tău PORTOCALIU!',
-                    'T3': '� Excelent! Premiul tău VERDE!'
+                    'T1': '🌟 Good start! Your YELLOW prize!',
+                    'T2': '👏 Very good! Your ORANGE prize!',
+                    'T3': '🏆 Excellent! Your GREEN prize!'
                 };
                 document.getElementById('previousTierMessage').textContent = messages[previousTier];
             } else {
@@ -542,7 +542,7 @@
             const question = currentQuestions[currentQuestionIndex];
             
             document.getElementById('questionCounter').textContent = 
-                `Întrebarea ${currentQuestionIndex + 1} din ${CONFIG.NUM_QUESTIONS}`;
+                `Question ${currentQuestionIndex + 1} of ${CONFIG.NUM_QUESTIONS}`;
             
             document.getElementById('questionText').textContent = question.q;
             
@@ -635,9 +635,9 @@
             tierBadge.innerHTML = `<div class="tier-badge tier-${tier.toLowerCase()}">${tier}</div>`;
             
             const messages = {
-                'T1': 'Bun început! 🌟 Continuă să înveți! Mergi la stand pentru premiul tău GALBEN!',
-                'T2': 'Foarte bine! 👏 Ești pe drumul cel bun! Mergi la stand pentru premiul tău PORTOCALIU!',
-                'T3': 'Excelent! 🎉 Ai răspuns corect la toate! Mergi la stand pentru premiul tău VERDE!'
+                'T1': 'Good start! 🌟 Keep learning! Go to the booth for your YELLOW prize!',
+                'T2': 'Very good! 👏 You\'re on the right track! Go to the booth for your ORANGE prize!',
+                'T3': 'Excellent! 🎉 You answered all correctly! Go to the booth for your GREEN prize!'
             };
             
             document.getElementById('tierMessage').textContent = messages[tier];
