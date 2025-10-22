@@ -560,7 +560,7 @@
             selectedOption = null;
             document.getElementById('nextBtn').disabled = true;
             document.getElementById('nextBtn').textContent = 
-                currentQuestionIndex === CONFIG.NUM_QUESTIONS - 1 ? 'Finalizează' : 'Următoarea';
+                currentQuestionIndex === CONFIG.NUM_QUESTIONS - 1 ? 'Finish' : 'Next';
         }
         
         function selectOption(index) {
@@ -574,13 +574,14 @@
         }
         
         function nextQuestion() {
-            if (selectedOption === null) return;
+            // Prevent advancing without selecting an answer
+            if (selectedOption === null || selectedOption === undefined) return;
             
             userAnswers.push(selectedOption);
             
             if (currentQuestionIndex < CONFIG.NUM_QUESTIONS - 1) {
                 currentQuestionIndex++;
-                saveQuizProgress(); // Salvează progresul după fiecare răspuns
+                saveQuizProgress(); // Save progress after each answer
                 displayQuestion();
             } else {
                 finishQuiz();
@@ -613,17 +614,20 @@
         function calculateScore() {
             let correct = 0;
             currentQuestions.forEach((q, i) => {
+                console.log(`Q${i+1}: User answered ${userAnswers[i]}, Correct is ${q.correct}, Match: ${userAnswers[i] === q.correct}`);
                 if (userAnswers[i] === q.correct) {
                     correct++;
                 }
             });
+            console.log(`Total correct: ${correct}/${currentQuestions.length}`);
             return correct;
         }
         
         function getTier(score) {
-            if (score <= 1) return 'T1';  // 0-1/3 = T1 Galben
-            if (score === 2) return 'T2';  // 2/3 = T2 Portocaliu
-            return 'T3';                   // 3/3 = T3 Verde
+            if (score === 0) return null;  // 0/3 = No tier
+            if (score === 1) return 'T1';  // 1/3 = T1 Yellow
+            if (score === 2) return 'T2';  // 2/3 = T2 Orange
+            return 'T3';                   // 3/3 = T3 Green
         }
         
         function displayResults(score, tier) {
@@ -632,15 +636,23 @@
             document.getElementById('scoreDisplay').textContent = `${score}/${CONFIG.NUM_QUESTIONS}`;
             
             const tierBadge = document.getElementById('tierBadge');
-            tierBadge.innerHTML = `<div class="tier-badge tier-${tier.toLowerCase()}">${tier}</div>`;
+            const tierMessage = document.getElementById('tierMessage');
             
-            const messages = {
-                'T1': 'Good start! 🌟 Keep learning! Go to the booth for your YELLOW prize!',
-                'T2': 'Very good! 👏 You\'re on the right track! Go to the booth for your ORANGE prize!',
-                'T3': 'Excellent! 🎉 You answered all correctly! Go to the booth for your GREEN prize!'
-            };
-            
-            document.getElementById('tierMessage').textContent = messages[tier];
+            if (score === 0) {
+                // No tier badge for 0 score
+                tierBadge.innerHTML = '';
+                tierMessage.textContent = '';
+            } else {
+                tierBadge.innerHTML = `<div class="tier-badge tier-${tier.toLowerCase()}">${tier}</div>`;
+                
+                const messages = {
+                    'T1': 'Good start! 🌟 Keep learning! Go to the booth for your YELLOW prize!',
+                    'T2': 'Very good! 👏 You\'re on the right track! Go to the booth for your ORANGE prize!',
+                    'T3': 'Excellent! 🎉 You answered all correctly! Go to the booth for your GREEN prize!'
+                };
+                
+                tierMessage.textContent = messages[tier];
+            }
             
             // Afișează sau ascunde butonul de revendicare în funcție de scor
             const claimSection = document.getElementById('claimPrizeSection');
