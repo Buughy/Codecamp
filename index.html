@@ -478,11 +478,23 @@
         }
         
         function claimPrize() {
-            // Marchează ca revendicat
+            // Confirmation dialog to ensure staff is present
+            const confirmed = confirm(
+                "⚠️ IMPORTANT!\n\n" +
+                "Are you with a Visma booth staff member right now?\n\n" +
+                "You can only claim your prize ONCE and it must be done in the presence of booth staff.\n\n" +
+                "Click OK only if a staff member is present."
+            );
+            
+            if (!confirmed) {
+                return; // User cancelled - don't claim
+            }
+            
+            // Mark as claimed
             localStorage.setItem(CONFIG.LOCAL_STORAGE_KEY, '1');
-            // Șterge progresul salvat
+            // Clear saved progress
             clearQuizProgress();
-            // Afișează ecranul "ai participat deja" cu rezultatul
+            // Show "already participated" screen with result
             showAlreadyPlayedScreen();
         }
         
